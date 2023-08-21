@@ -87,6 +87,15 @@ export const items = [
       </SvgIcon>
     )
   },
+  {
+    title: 'Index2',
+    path: '/index2',
+    icon: (
+      <SvgIcon fontSize="small">
+        <ChartBarIcon />
+      </SvgIcon>
+    )
+  },
 /*   {
     title: 'Account',
     path: '/account',

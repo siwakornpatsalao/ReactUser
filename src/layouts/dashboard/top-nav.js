@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import BellIcon from '@heroicons/react/24/solid/BellIcon';
 import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
 import Bars3Icon from '@heroicons/react/24/solid/Bars3Icon';
-import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import {
   Avatar,
   Badge,
@@ -18,9 +18,22 @@ import { usePopover } from 'src/hooks/use-popover';
 import { AccountPopover } from './account-popover';
 import { useEffect , useState, useRef} from 'react';
 import { useRouter } from 'next/navigation';
+import List from '@mui/material/List';
+import Divider from '@mui/material/Divider';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import InboxIcon from '@mui/icons-material/MoveToInbox';
+import MailIcon from '@mui/icons-material/Mail';
+import * as React from "react";
+import SwipeableDrawer from '@mui/material/SwipeableDrawer';
+import Button from '@mui/material/Button';
+
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
+
 
 export const TopNav = (props) => {
   const { onNavOpen } = props;
@@ -29,9 +42,63 @@ export const TopNav = (props) => {
   const initial = useRef(false);
   const [count,setCount] = useState(0);
   const router = useRouter();
+  const [open, setOpen] = useState(false);
+
+  const [state, setState] = useState({
+    right: false,
+  });
+
+  const toggleDrawer = (anchor, open) => (event) => {
+    if (
+      event &&
+      event.type === 'keydown' &&
+      (event.key === 'Tab' || event.key === 'Shift')
+    ) {
+      return;
+    }
+
+    setState({ ...state, [anchor]: open });
+  };
+
+  const list = (anchor) => (
+    <Box
+      sx={{ width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 250 }}
+      role="presentation"
+      onClick={toggleDrawer(anchor, false)}
+      onKeyDown={toggleDrawer(anchor, false)}
+    >
+      <List>
+        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+          <ListItem key={text} disablePadding>
+            <ListItemButton>
+              <ListItemIcon>
+                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+              </ListItemIcon>
+              <ListItemText primary={text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+      <Divider />
+
+      {/* content */}
+      <List>
+        {['All mail', 'Trash', 'Spam'].map((text, index) => (
+          <ListItem key={text} disablePadding>
+            <ListItemButton>
+              <ListItemIcon>
+                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+              </ListItemIcon>
+              <ListItemText primary={text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  );
 
   function handleOrderPage(){
-    router.push('/order')
+    // router.push('/order')
   }
 
   useEffect(() => {
@@ -115,19 +182,34 @@ export const TopNav = (props) => {
                 </SvgIcon>
               </IconButton>
             </Tooltip> */}
-
-            <Tooltip title="แจ้งเตือนรายการอาหาร">
-      <IconButton onClick={handleOrderPage}>
+      {/* <Tooltip title="ตะกร้า">
+         <IconButton onClick={handleOrderPage}>
         <Badge
           badgeContent={count}
           color="success"
         >
           <SvgIcon fontSize="small">
-            <BellIcon />
+            <ShoppingCartIcon />
           </SvgIcon>
         </Badge>
       </IconButton>
-    </Tooltip>
+    </Tooltip> */}
+
+        <React.Fragment key={'right'}>
+          <IconButton onClick={toggleDrawer('right', true)}>
+            <SvgIcon fontSize="small">
+              <ShoppingCartIcon />
+            </SvgIcon>
+          </IconButton>
+          <SwipeableDrawer
+            anchor={'right'}
+            open={state['right']}
+            onClose={toggleDrawer('right', false)}
+            onOpen={toggleDrawer('right', true)}
+          >
+            {list('right')}
+          </SwipeableDrawer>
+        </React.Fragment>
     {/* <Avatar
       onClick={accountPopover.handleOpen}
       ref={accountPopover.anchorRef}
@@ -138,13 +220,14 @@ export const TopNav = (props) => {
          }}
         src="/assets/avatars/avatar-anika-visser.png"
          /> */}
-      <SvgIcon 
+
+      {/* <SvgIcon 
         onClick={accountPopover.handleOpen}
         ref={accountPopover.anchorRef} 
         sx={{cursor: 'pointer'}}
         ontSize="small">
           <UsersIcon />
-      </SvgIcon>
+      </SvgIcon> */}
           </Stack>
         </Stack>
       </Box>

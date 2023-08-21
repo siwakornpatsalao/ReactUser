@@ -54,7 +54,7 @@ export const SideNav = (props) => {
               width: 32
             }}
           >
-            <Logo />
+            {/* <Logo /> */}ICON
           </Box>
           <Box
             sx={{

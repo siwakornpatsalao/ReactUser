@@ -35,20 +35,108 @@ function Step1({setType,type,setProductType,productType}) {
       };
   
     return (
-      <div>
-        <h1>เลือกรูปแบบโปรโมชั่น</h1>
+      <div style={{ display: "flex", marginTop: '70px' }}>
+        <div style={{marginLeft:'100px', width: "500px"}}>
+{/*         <Typography variant="h5" component="h5">
+          เลือกรูปแบบโปรโมชั่น
+        </Typography> */}
+        <br/>
         <RadioGroup value={type} onChange={handleSelectedChange} >
-          <FormControlLabel value="percent" control={<Radio />} label="เปอร์เซ็นต์" />
-          <FormControlLabel value="specific" control={<Radio />} label="ราคาแบบเจาะจง" />
-          <FormControlLabel value="free" control={<Radio />} label="เมนูแถมฟรี" />
-        </RadioGroup>
+        <FormControlLabel
+          value="percent"
+          control={<Radio />}
+          label={
+            <Box
+              border="1px solid black"
+              borderRadius="4px"
+              padding="16px"
+              display="block"
+            >
+              <Typography variant="h5" component="h5">
+                เปอร์เซ็นต์
+                <Typography variant="h6" component="h6" style={{ color: "#64748B" }}>
+                  ระบุส่วนลดให้ลูกค้าแบบเป็น % เช่น อเมริกาโน่ลด 10%
+                </Typography>
+              </Typography>
+            </Box>
+          }
+        />
 
-        <h1>เลือกรูปแบบโปรโมชั่นให้สินค้า</h1>
-        <RadioGroup value={productType} onChange={handleSelected2Change} >
-          <FormControlLabel value="menu" control={<Radio />} label="เฉพาะรายการ" />
-          <FormControlLabel value="category" control={<Radio />} label="หมวดหมู่" />
-          <FormControlLabel value="amount" control={<Radio />} label="คำสั่งซื้อ" />
+            <br/>
+          <FormControlLabel value="specific" control={<Radio />} label={
+            <Box
+            border="1px solid black"
+            borderRadius="4px"
+            padding="16px"
+            display="block"
+          >
+              <Typography variant="h5" component="h5">
+                ราคาแบบเจาะจง <Typography variant="h6" component="h6" style={{ color: "#64748B" }}>ระบุส่วนลดให้ลูกค้าแบบเป็นราคาเฉพาะเจาะจง เช่น อเมริกาโน่ลด 5 บาท</Typography>
+              </Typography>
+            </Box>
+            } />
+            <br/>
+          <FormControlLabel value="free" control={<Radio />} label={
+            <Box
+            border="1px solid black"
+            borderRadius="4px"
+            padding="16px"
+            display="block"
+          >
+              <Typography variant="h5" component="h5">
+                เมนูแถมฟรี <Typography variant="h6" component="h6" style={{ color: "#64748B" }}>ระบุส่วนลดให้ลูกค้าแบบเป็นราคาเฉพาะเจาะจง เช่น อเมริกาโน่ลด 5 บาท</Typography>
+              </Typography>
+              </Box>
+            } />
         </RadioGroup>
+        </div>
+
+        <div style={{marginLeft:'200px', width: '290px'}}>
+{/*         <Typography variant="h5" component="h5">
+          เลือกรูปแบบโปรโมชั่นให้สินค้า
+        </Typography> */}
+        <br/>
+        <RadioGroup value={productType} onChange={handleSelected2Change} >
+          <FormControlLabel value="menu" control={<Radio />} label={
+            <Box
+            border="1px solid black"
+            borderRadius="4px"
+            padding="16px"
+            display="block"
+          >
+              <Typography variant="h5" component="h5">
+                เฉพาะรายการ <Typography variant="h6" component="h6" style={{ color: "#64748B" }}>ลดราคาเฉพาะเมนูที่ต้องการ</Typography>
+              </Typography>
+              </Box>
+            } />
+            <br/>
+          <FormControlLabel value="category" control={<Radio />} label={
+             <Box
+             border="1px solid black"
+             borderRadius="4px"
+             padding="16px"
+             display="block"
+           >
+              <Typography variant="h5" component="h5">
+                หมวดหมู่ <Typography variant="h6" component="h6" style={{ color: "#64748B" }}>ลดราคาทุกรายการในหมวดหมู่</Typography>
+              </Typography>
+              </Box>
+            } />
+            <br/>
+          <FormControlLabel value="amount" control={<Radio />} label={
+             <Box
+             border="1px solid black"
+             borderRadius="4px"
+             padding="16px"
+             display="block"
+           >
+              <Typography variant="h5" component="h5">
+                คำสั่งซื้อ <Typography variant="h6" component="h6" style={{ color: "#64748B" }}>ลดราคาสำหรับทั้งคำสั้งซื้อ</Typography>
+              </Typography>
+              </Box>
+            } />
+        </RadioGroup>
+      </div>
       </div>
     );
 }
