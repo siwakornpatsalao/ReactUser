@@ -24,11 +24,13 @@ import IconButton from "@mui/material/IconButton";
 import TablePagination from '@mui/material/TablePagination';
 import { ItemSearch } from "../sections/item/item-search";
 import { ItemCard } from "../sections/item/item-card";
+import Carousel from 'react-material-ui-carousel'
 
 function Index2(){
     const [items, setItems] = useState([]);
     const [originalItems, setOriginalItems] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [promotion, setPromotions] = useState([]);
     const [category, setCategory] = useState('');
     const initial = useRef(false);
 
@@ -84,27 +86,58 @@ function Index2(){
             }
           }
 
+          async function fetchPromotion() {
+            try {
+              const res = await fetch("http://localhost:5000/promotions");
+              const data = await res.json();
+              setPromotions(data);
+              console.log(data);
+            } catch (error) {
+              console.error("Error fetching promotion:", error);
+            }
+          }
+
         if (!initial.current) {
             initial.current = true;
             console.log(initial.current);
             fetchItems();
             fetchCategory();
+            fetchPromotion();
           }
     }, []);
 
     return(
-        <div style={{padding:20}}>
-        <div style={{ display: "flex" , marginBottom: 20}}>
+      <>
+      <Box component="main" /* sx={{ backgroundColor: '#D3D3D3'}} */>
+        <Container maxWidth="xl">
+
+        <Carousel interval={10000}>
+        {promotion.map((item, i) => (
+                <div key={i}>
+                    <img
+                        style={{
+                            maxWidth: "100%",
+                            width: "1500px", 
+                            height: "200px", 
+                        }}
+                        src={item.image}
+                        alt={`Promotion ${i}`}
+                    />
+                </div>
+            ))}
+        </Carousel>
+        <div style={{ display: "flex" , alignItems: "flex-end"}}>
             <div style={{ flex: 1 }}>
             <ItemSearch onSearch={(searchValue) => handleSearchItem(searchValue)}/>
             </div>
-
+            <span style={{ marginRight: "20px" }}></span>
             <div style={{ justifyContent: "flex-end" }}>
             <TextField
                 value={category}
-                style={{ width: "280px" }}
                 select
                 focused
+                fullWidth
+                sx={{backgroundColor: 'white'}}
                 label="หมวดหมู่"
                 defaultValue="เครื่องดื่ม"
                 helperText="Please select your category"
@@ -128,21 +161,25 @@ function Index2(){
                 ))}
             </TextField>
             </div>
+
         </div>
 
+        <br/>
         <Grid container spacing={3}>
               {items.map((item) => (
                 <Grid
                   xs={12}
-                  md={6}
-                  lg={3}
+                  md={4}
+                  lg={2.4}
                   key={item._id}
                 >
                    <ItemCard item={item}/> 
                 </Grid>
               ))}
         </Grid>
-        </div>
+        </Container>
+        </Box>
+        </>
     )
 }
 

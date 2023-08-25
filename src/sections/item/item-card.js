@@ -30,6 +30,7 @@ export const ItemCard = (props) => {
         
       }}
     >
+      <Link href={`/detail?id=${item._id}`} style={{ textDecoration: 'none' }}>
       <CardContent>
         <Box
           sx={{
@@ -37,11 +38,10 @@ export const ItemCard = (props) => {
             justifyContent: 'center',
           }}
         >
-          <img
-            src={item.thumbnail}
-            variant="square"
-            height="200px"
-          />
+          <img style={{
+                maxWidth: "100%",
+              }} src={item.thumbnail} alt="Preview" variant="square" width='300px' height='200px'
+                />
         </Box>
         <br/>
 
@@ -66,6 +66,7 @@ export const ItemCard = (props) => {
           {item.price}.-
         </Typography>
       </CardContent>
+      </Link>
       <Box sx={{ flexGrow: 1 }} />
 {/*       <Divider /> */}
       <Stack
@@ -80,12 +81,6 @@ export const ItemCard = (props) => {
           direction="row"
           spacing={1}
         >
-          <SvgIcon
-            color="action"
-            fontSize="small"
-          >
-            <ClockIcon />
-          </SvgIcon>
 
           {/* {hasPromotion && (
             <div>
@@ -130,12 +125,6 @@ export const ItemCard = (props) => {
           direction="row"
           spacing={1}
         >
-          <SvgIcon
-            color="action"
-            fontSize="small"
-          >
-            <ArrowDownOnSquareIcon />
-          </SvgIcon>
           <Typography
             color="text.secondary"
             display="inline"
