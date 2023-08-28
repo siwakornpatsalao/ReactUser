@@ -1,4 +1,4 @@
-import { Button, Box, Container, Typography } from "@mui/material";
+import { Button, Box, Container, Typography, TextField } from "@mui/material";
 import { useRouter } from 'next/router';
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import Grid from "@mui/material/Grid";
@@ -16,9 +16,25 @@ export default function Detail(){
     const [optionGroups, setOptionGroups] = useState([]);
     const [selectedAddons, setSelectedAddons] = useState([]);
     const [selectedOptionGroups, setSelectedOptionGroups] = useState([]);
+    const [amount, setAmount] = useState(0);
+    const [note, setNote] = useState('');
 
     function handleBack(){
         router.back();
+    }
+
+    function handleMinus(){
+        if(amount>0){
+            setAmount(amount-1);
+        }
+    }
+
+    function addToCart(){
+
+    }
+
+    function handlePlus(){
+        setAmount(amount+1);
     }
     
 
@@ -85,13 +101,14 @@ export default function Detail(){
           <Grid container justifyContent="space-between" alignItems="flex-start" spacing={2} sx={{ marginTop: 2 }}>
             <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
                 <img
-                    style={{maxWidth: "100%",}}
+                    style={{maxWidth: "100%"}}
                     src={item.thumbnail}
                     alt="Preview"
                     variant="square"
-                    width='100%'
-                    height='auto'
+                    width='800px' height='600px'
                 />
+                {/* เพิ่มจำนวนสินค้า */}
+                
             </Grid>
             <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
                 <Box sx={{ paddingLeft: { xs: 0, sm: 2, md: 3, lg: 4, xl: 5 } }}>
@@ -105,7 +122,7 @@ export default function Detail(){
                     {addons.map((addon) => (
                         <FormGroup key={addon._id}>
                         <FormControlLabel
-                        label={<Typography variant="h6" component="h6" style={{ color: 'black', fontWeight: "normal" }}>
+                        label={<Typography variant="h5" component="h5" style={{ color: 'black', fontWeight: "normal" }}>
                         {addon.name}
                                 </Typography>}
                             control={
@@ -126,6 +143,7 @@ export default function Detail(){
                     </>
                     )}
                     <br/>
+
                     {item.optionGroupId && item.optionGroupId.length > 0 && (
                         <>
                     <Typography variant="h4" component="h4">
@@ -172,7 +190,26 @@ export default function Detail(){
                     )}
                     </>
                 )}
-                <Button fullWidth variant="contained">
+
+                <br/>
+                <Typography variant="h4" component="h4" sx={{display:'flex'}}>
+                    Note: <TextField focused fullWidth
+                            label="หมายเหตุสำหรับร้านค้า"
+                            value={note}
+                            name="name" sx={{ marginLeft: '10px' }}/>
+                </Typography>
+                <br/>
+                <Typography variant="h4" component="h4" sx={{display:'flex', justifyContent:'center'}}>
+                    <Button variant="contained" style={{backgroundColor:'red'}} onClick={handleMinus} sx={{ minWidth: '36px', minHeight: '36px', marginLeft: '10px' }}>
+                        -
+                    </Button>
+                    <TextField value={amount} sx={{ width: '60px', marginLeft: '10px', marginRight: '10px' }} inputProps={{style: {fontSize: 30}}} />
+                    <Button variant="contained" style={{backgroundColor:'green'}} onClick={handlePlus} sx={{ minWidth: '36px', minHeight: '36px' }}>
+                        +
+                    </Button>
+                    </Typography>
+                <br/>
+                <Button fullWidth variant="contained" onClick={addToCart}>
                     ซื้อสินค้า {/* {item.price} บาท */}
                 </Button>
                 </Box>

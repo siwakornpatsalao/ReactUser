@@ -29,6 +29,7 @@ export const ItemCard = (props) => {
         maxWidth: 350,
         
       }}
+      style={{backgroundColor:'#91BCD3'}} /* #E5D5D1  */
     >
       <Link href={`/detail?id=${item._id}`} style={{ textDecoration: 'none' }}>
       <CardContent>
@@ -51,9 +52,10 @@ export const ItemCard = (props) => {
             overflow: 'hidden',
             textOverflow: 'ellipsis',
           }}
+          style={{ color: 'black'}}
+          variant="h6" component="h6"
           align="left"
           gutterBottom
-          variant="body1"
         >
           {item.name}
         </Typography>

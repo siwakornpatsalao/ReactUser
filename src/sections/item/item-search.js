@@ -24,7 +24,7 @@ export const ItemSearch = ({ onSearch }) => {
             </SvgIcon>
           </InputAdornment>
         )}
-        sx={{ maxWidth: 1000 }}
+        sx={{ maxWidth: 1000, backgroundColor:'#D9D9D9','&:hover': { backgroundColor: '#D9D9D9' } }}
       />
     </Card>
   );
