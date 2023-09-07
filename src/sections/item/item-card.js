@@ -26,10 +26,12 @@ export const ItemCard = (props) => {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        maxWidth: 350,
-        
+        maxWidth: 320,
+        border: '1px solid #ccc', 
       }}
-      style={{backgroundColor:'#91BCD3'}} /* #E5D5D1  */
+      style={{
+        boxShadow: ' 2px 9px #EADDCD',/* #D8E8DC */
+      }}
     >
       <Link href={`/detail?id=${item._id}`} style={{ textDecoration: 'none' }}>
       <CardContent>
@@ -48,14 +50,16 @@ export const ItemCard = (props) => {
 
         <Typography
           sx={{
+            marginTop: '10px',
             marginLeft: '10px',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
+            fontSize: '20px'
           }}
           style={{ color: 'black'}}
-          variant="h6" component="h6"
           align="left"
           gutterBottom
+          variant="body1"
         >
           {item.name}
         </Typography>
@@ -64,6 +68,7 @@ export const ItemCard = (props) => {
           align="left"
           variant="body1"
           color="red"
+          sx={{fontSize: '18px'}}
         >
           {item.price}.-
         </Typography>

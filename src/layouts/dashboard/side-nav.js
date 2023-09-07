@@ -6,11 +6,13 @@ import ChevronUpDownIcon from '@heroicons/react/24/solid/ChevronUpDownIcon';
 import {
   Box,
   Button,
+  CardContent,
   Divider,
   Drawer,
   Stack,
   SvgIcon,
   Typography,
+  Card,
   useMediaQuery
 } from '@mui/material';
 import { Logo } from 'src/components/logo';
@@ -18,6 +20,9 @@ import { Scrollbar } from 'src/components/scrollbar';
 import { items } from './config';
 import { SideNavItem } from './side-nav-item';
 import { useAuth } from 'src/hooks/use-auth';
+import Checkbox from '@mui/material/Checkbox';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 export const SideNav = (props) => {
   const { open, onClose } = props;
@@ -37,6 +42,9 @@ export const SideNav = (props) => {
         }
       }}
     >
+            <div style={{ fontSize: 30, height: '70px', padding: '10px' }}>
+    <span style={{ marginLeft: '125px', fontWeight: 'bold' }}>สรุปออเดอร์</span>
+  </div>
       <Box
         sx={{
           display: 'flex',
@@ -44,53 +52,8 @@ export const SideNav = (props) => {
           height: '100%'
         }}
       >
-        <Box sx={{ p: 3 }}>
-          <Box
-            component={NextLink}
-            href="/"
-            sx={{
-              display: 'inline-flex',
-              height: 32,
-              width: 32
-            }}
-          >
-            {/* <Logo /> */}ICON
-          </Box>
-          <Box
-            sx={{
-              alignItems: 'center',
-              backgroundColor: 'rgba(255, 255, 255, 0.04)',
-              borderRadius: 1,
-              cursor: 'pointer',
-              display: 'flex',
-              justifyContent: 'space-between',
-              mt: 2,
-              p: '12px'
-            }}
-          >
-            <div>
-              <Typography
-                color="inherit"
-                variant="subtitle1"
-              >
-                Shop
-              </Typography>
-              <Typography
-                color="neutral.400"
-                variant="body2"
-              >
-                Production
-              </Typography>
-            </div>
-            <SvgIcon
-              fontSize="small"
-              sx={{ color: 'neutral.500' }}
-            >
-              <ChevronUpDownIcon />
-            </SvgIcon>
-          </Box>
-        </Box>
-        <Divider sx={{ borderColor: 'neutral.700' }} />
+
+        
         <Box
           component="nav"
           sx={{
@@ -108,7 +71,38 @@ export const SideNav = (props) => {
               m: 0
             }}
           >
-            {items.map((item) => {
+            <br/>
+            <Card>
+              <CardContent>
+                เครปไส้แตก แป้ง ราคา จำนวน <br/>
+                test<br/>test<br/>test<br/>test<br/>test<br/>test<br/>test<br/>
+              </CardContent>
+            </Card>
+            <br/>
+            <Card>
+              <CardContent>
+                <Typography variant="h4">
+                วิธีการชำระเงิน
+                </Typography>
+                <br/>
+                <FormGroup>
+                  <FormControlLabel control={<Checkbox />} label={
+                    <Typography variant="h6" component="h6">
+                      Scan QR Code
+                    </Typography>
+                  } />
+                    <br/>
+                  <FormControlLabel control={<Checkbox />} label={
+                    <Typography variant="h6" component="h6">
+                      จ่ายเงินสด
+                    </Typography>
+                  } />
+                </FormGroup>
+              </CardContent>
+            </Card>
+
+
+            {/* {items.map((item) => {
               const active = item.path ? (pathname === item.path) : false;
 
               return (
@@ -122,60 +116,17 @@ export const SideNav = (props) => {
                   title={item.title}
                 />
               );
-            })}
+            })} */}
           </Stack>
         </Box>
-       {/*  <Divider sx={{ borderColor: 'neutral.700' }} />
-        <Box
-          sx={{
-            px: 2,
-            py: 3
-          }}
-        >
-          <Typography
-            color="neutral.100"
-            variant="subtitle2"
-          >
-            Need more features?
-          </Typography>
-          <Typography
-            color="neutral.500"
-            variant="body2"
-          >
-            Check out our Pro solution template.
-          </Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              mt: 2,
-              mx: 'auto',
-              width: '160px',
-              '& img': {
-                width: '100%'
-              }
-            }}
-          >
-            <img
-              alt="Go to pro"
-              src="/assets/devias-kit-pro.png"
-            />
-          </Box>
-          <Button
-            component="a"
-            endIcon={(
-              <SvgIcon fontSize="small">
-                <ArrowTopRightOnSquareIcon />
-              </SvgIcon>
-            )}
-            fullWidth
-            href="https://material-kit-pro-react.devias.io/"
-            sx={{ mt: 2 }}
-            target="_blank"
-            variant="contained"
-          >
-            Pro Live Preview
-          </Button>
-        </Box> */}
+        <Card sx={{ borderRadius: 0 ,border: '2px solid black'}}>
+              <CardContent>
+                <span style={{fontSize:25}}>ราคารวม</span>  <span style={{marginLeft:'170px'}}></span> <span style={{fontSize:25}}>50 บาท</span><br/><br/>
+                <Button  sx={{ fontSize:25}} variant='contained' fullWidth>
+                ชำระเงิน
+                </Button>
+              </CardContent>
+            </Card>
       </Box>
     </Scrollbar>
   );
@@ -183,13 +134,13 @@ export const SideNav = (props) => {
   if (lgUp) {
     return (
       <Drawer
-        anchor="left"
+        anchor="right"
         open
         PaperProps={{
           sx: {
             backgroundColor: 'neutral.800',
             color: 'common.white',
-            width: 280
+            width: 430
           }
         }}
         variant="permanent"
@@ -201,14 +152,14 @@ export const SideNav = (props) => {
 
   return (
     <Drawer
-      anchor="left"
+      anchor="right"
       onClose={onClose}
       open={open}
       PaperProps={{
         sx: {
           backgroundColor: 'neutral.800',
           color: 'common.white',
-          width: 280
+          width: 400
         }
       }}
       sx={{ zIndex: (theme) => theme.zIndex.appBar + 100 }}

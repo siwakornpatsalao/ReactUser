@@ -1,4 +1,4 @@
-import { Button, Box, Container, Typography, TextField } from "@mui/material";
+import { Button, Box, Container, Typography, TextField, CardContent, Card } from "@mui/material";
 import { useRouter } from 'next/router';
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import Grid from "@mui/material/Grid";
@@ -94,9 +94,23 @@ export default function Detail(){
         <>
         <Box component="main" /* sx={{ backgroundColor: '#D3D3D3'}} */>
          <Container maxWidth="xl">
+         <br/>
           <Button variant="contained" color="primary" onClick={handleBack}>
             ย้อนกลับ
           </Button>
+            <br/>
+            <br/>
+            <Card sx={{
+        marginTop:'20px',
+        display: 'flex',
+        width:'100%',
+        border: '1px solid #ccc', 
+      }}
+      style={{
+        boxShadow: ' 2px 9px #EADDCD',/* #D8E8DC */
+      }}>
+            <CardContent>
+
           
           <Grid container justifyContent="space-between" alignItems="flex-start" spacing={2} sx={{ marginTop: 2 }}>
             <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
@@ -217,7 +231,9 @@ export default function Detail(){
 
 
           </Grid>
-
+                
+          </CardContent>
+          </Card>
          </Container>
         </Box>
         </>

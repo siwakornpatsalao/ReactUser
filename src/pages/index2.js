@@ -110,14 +110,15 @@ function Index2(){
       <>
       <Box component="main" /* sx={{ backgroundColor: '#D3D3D3'}} */>
         <Container maxWidth="xl">
-
+<br/>
         <Carousel interval={10000}>
+          
         {promotion.map((item, i) => (
                 <div key={i}>
                     <img
                         style={{
                             maxWidth: "100%",
-                            width: "1500px", 
+                            width: "1600px", 
                             height: "200px", 
                         }}
                         src={item.image}
@@ -165,15 +166,16 @@ function Index2(){
         </div>
 
         <br/>
-        <Grid container spacing={3}>
+        <Grid style={{backgroundColor:'#FCF6EE' /* backgroundColor: '#F2FFF5' */}} sx={{borderRadius:'20px'}} container spacing={3}>
               {items.map((item) => (
                 <Grid
                   xs={12}
-                  md={4}
-                  lg={2.4}
+                  md={6}
+                  lg={3}
                   key={item._id}
                 >
                    <ItemCard item={item}/> 
+                   <br/>
                 </Grid>
               ))}
         </Grid>

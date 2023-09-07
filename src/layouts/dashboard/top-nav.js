@@ -32,7 +32,7 @@ import Button from '@mui/material/Button';
 
 
 const SIDE_NAV_WIDTH = 280;
-const TOP_NAV_HEIGHT = 64;
+const TOP_NAV_HEIGHT = 70;
 
 
 export const TopNav = (props) => {
@@ -128,7 +128,7 @@ export const TopNav = (props) => {
         component="header"
         sx={{
           backdropFilter: 'blur(6px)',
-          /* backgroundColor: '#90EE90', */
+          background: "linear-gradient(90deg,  #FEFFB8, 70%, #EBA03E);",
           position: 'sticky',
           left: {
             lg: `${SIDE_NAV_WIDTH}px`
@@ -155,13 +155,13 @@ export const TopNav = (props) => {
             direction="row"
             spacing={2}
           >
-            {/* {!lgUp && (
+            {!lgUp && (
               <IconButton onClick={onNavOpen}>
                 <SvgIcon fontSize="small">
                   <Bars3Icon />
                 </SvgIcon>
               </IconButton>
-            )} */}
+            )}
             {/* <Tooltip title="Search">
               <IconButton>
                 <SvgIcon fontSize="small">
