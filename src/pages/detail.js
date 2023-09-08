@@ -18,6 +18,8 @@ export default function Detail(){
     const [selectedOptionGroups, setSelectedOptionGroups] = useState([]);
     const [amount, setAmount] = useState(0);
     const [note, setNote] = useState('');
+    const [sideClose, setSideClose] = useState(true);
+    const [cartAmount, setCartAmount] = useState(0);
 
     function handleBack(){
         router.back();
@@ -30,7 +32,7 @@ export default function Detail(){
     }
 
     function addToCart(){
-
+        setCartAmount(amount);
     }
 
     function handlePlus(){
@@ -91,9 +93,9 @@ export default function Detail(){
     }, [addons,optionGroups, id, item.addonId, item.optionGroupId]);
 
     return(
-        <>
+        <DashboardLayout sideClose={sideClose} amount={cartAmount}>
         <Box component="main" /* sx={{ backgroundColor: '#D3D3D3'}} */>
-         <Container maxWidth="xl">
+         <Container maxWidth="x">
          <br/>
           <Button variant="contained" color="primary" onClick={handleBack}>
             ย้อนกลับ
@@ -111,32 +113,33 @@ export default function Detail(){
       }}>
             <CardContent>
 
-          
           <Grid container justifyContent="space-between" alignItems="flex-start" spacing={2} sx={{ marginTop: 2 }}>
             <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
+                <Typography variant="h4" component="h4">
+                    {item.name}
+                </Typography>
+                <br/>
                 <img
-                    style={{maxWidth: "100%"}}
+                    style={{height: '100%',
+                    maxWidth: '100%',}}
                     src={item.thumbnail}
-                    alt="Preview"
-                    variant="square"
-                    width='800px' height='600px'
                 />
                 {/* เพิ่มจำนวนสินค้า */}
                 
             </Grid>
             <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
-                <Box sx={{ paddingLeft: { xs: 0, sm: 2, md: 3, lg: 4, xl: 5 } }}>
+                <Box sx={{ paddingLeft: { xs: 4, sm: 2, md: 3, lg: 4, xl: 5 } }}>
                     {item.addonId && item.addonId.length>0 && (
                         <>
                     <Typography variant="h4" component="h4">
-                        เมนูเพิ่มเติม
+                        <u>เมนูเพิ่มเติม</u>
                     </Typography>
                     <br/>
-
+                    <Grid container spacing={2} sx={{ marginLeft: '5px' }}>
                     {addons.map((addon) => (
                         <FormGroup key={addon._id}>
                         <FormControlLabel
-                        label={<Typography variant="h5" component="h5" style={{ color: 'black', fontWeight: "normal" }}>
+                        label={<Typography variant="h5" component="h5" style={{ color: 'black', fontWeight: "normal" ,whiteSpace: "pre-wrap",}}>
                         {addon.name}
                                 </Typography>}
                             control={
@@ -154,6 +157,7 @@ export default function Detail(){
                         />
                         </FormGroup>
                     ))}
+                    </Grid>
                     </>
                     )}
                     <br/>
@@ -161,47 +165,54 @@ export default function Detail(){
                     {item.optionGroupId && item.optionGroupId.length > 0 && (
                         <>
                     <Typography variant="h4" component="h4">
-                        ตัวเลือก
+                        <u>ตัวเลือก</u>
                     </Typography>
                     <br/>
 
                     {optionGroups && (
                         <>
-                            {optionGroups.map((option) => (
-                                <FormGroup key={option._id}>
-                                    <Typography variant="h5" component="h5" style={{ color: 'black', fontWeight: "normal" }}>
-                                        {option.name}
-                                    </Typography>
-                                    {option.options.map((optionSet) => (
-                                        <FormGroup key={optionSet._id}>
-                                            <FormControlLabel
-                                                label={
-                                                    <>
-                                                        <Typography variant="h6" component="h6" style={{ color: 'black', fontWeight: "normal" }}>
-                                                            {optionSet.name} +{optionSet.price} บาท
-                                                        </Typography>
-                                                    </>
-                                                }
-                                                control={
-                                                    <Checkbox
-                                                        checked={selectedOptionGroups.includes(optionSet._id)}
-                                                        onChange={() =>
-                                                            setSelectedOptionGroups((prev) =>
-                                                                prev.includes(optionSet._id)
-                                                                    ? prev.filter((id) => id !== optionSet._id)
-                                                                    : [...prev, optionSet._id]
-                                                            )
-                                                        }
-                                                    />
-                                                }
+                            {optionGroups.map((optionGroup) => (
+                            <FormGroup key={optionGroup._id}>
+                                <Typography variant="h5" component="h5" style={{ color: 'black', fontWeight: "normal", fontSize:26 }}>
+                                    {optionGroup.name}
+                                </Typography>
+                                <br/>
+                                <Grid container spacing={2}>
+                                {optionGroup.options.map((optionSet) => (
+                                    <Grid item key={optionSet._id} xs={6} sm={3} md={3} lg={3} xl={3}>
+                                    <FormGroup>
+                                        <FormControlLabel
+                                        label={
+                                            <>
+                                            <Typography variant="h6" component="h6" style={{ color: 'black', fontWeight: "normal",fontSize:23 }}>
+                                                {optionSet.name}<br/> <span style={{color:'grey', fontSize:20}}>+{optionSet.price} บาท</span>
+                                            </Typography>
+                                            </>
+                                        }
+                                        control={
+                                            <Checkbox
+                                            checked={selectedOptionGroups.includes(optionSet._id)}
+                                            onChange={() =>
+                                                setSelectedOptionGroups((prev) =>
+                                                prev.includes(optionSet._id)
+                                                    ? prev.filter((id) => id !== optionSet._id)
+                                                    : [...prev, optionSet._id]
+                                                )
+                                            }
                                             />
-                                        </FormGroup>
-                                    ))}
-                                    <br/>
-                                </FormGroup>
+                                        }
+                                        />
+                                    </FormGroup>
+                                    </Grid>
+                                ))}
+                                </Grid>
+                                <br/>
+                                <hr style={{ border: 'none', borderBottom: '1px solid black', margin: '10px 0' }} />
+                            </FormGroup>
                             ))}
+                            
                         </>
-                    )}
+                        )}
                     </>
                 )}
 
@@ -236,8 +247,6 @@ export default function Detail(){
           </Card>
          </Container>
         </Box>
-        </>
+        </DashboardLayout>
     )
 }
-
-Detail.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;

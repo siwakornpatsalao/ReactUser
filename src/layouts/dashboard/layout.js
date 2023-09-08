@@ -25,9 +25,10 @@ const LayoutContainer = styled('div')({
 });
 
 export const Layout = withAuthGuard((props) => {
-  const { children } = props;
+  const { children,sideClose,amount } = props;
   const pathname = usePathname();
   const [openNav, setOpenNav] = useState(false);
+
 
   const handlePathnameChange = useCallback(
     () => {
@@ -41,6 +42,10 @@ export const Layout = withAuthGuard((props) => {
   useEffect(
     () => {
       handlePathnameChange();
+      if(sideClose){
+        console.log(sideClose,'tetstsetstset');
+        setOpenNav(false)
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [pathname]
@@ -48,8 +53,12 @@ export const Layout = withAuthGuard((props) => {
 
   return (
     <>
-      <TopNav onNavOpen={() => setOpenNav(true)} />
-       <SideNav
+      <TopNav onNavOpen={() => setOpenNav(true)} amount={amount}/>
+      {sideClose ? (
+        <>{children}</>) 
+      : (
+        <>
+        <SideNav
         onClose={() => setOpenNav(false)}
         open={openNav}
       /> 
@@ -58,6 +67,8 @@ export const Layout = withAuthGuard((props) => {
           {children}
         </LayoutContainer>
       </LayoutRoot>
+      </>
+    )}
     </>
   );
 });

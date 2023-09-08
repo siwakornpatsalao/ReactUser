@@ -111,15 +111,14 @@ function Index2(){
       <Box component="main" /* sx={{ backgroundColor: '#D3D3D3'}} */>
         <Container maxWidth="xl">
 <br/>
-        <Carousel interval={10000}>
+        <Carousel sx={{margin: 'auto',maxWidth: '80%',}} interval={10000}>
           
         {promotion.map((item, i) => (
                 <div key={i}>
                     <img
                         style={{
-                            maxWidth: "100%",
-                            width: "1600px", 
-                            height: "200px", 
+                            height: '100%',
+                            maxWidth: '100%',
                         }}
                         src={item.image}
                         alt={`Promotion ${i}`}

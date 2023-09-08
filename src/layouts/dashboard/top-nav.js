@@ -36,17 +36,19 @@ const TOP_NAV_HEIGHT = 70;
 
 
 export const TopNav = (props) => {
-  const { onNavOpen } = props;
+  const { onNavOpen, amount } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
   const accountPopover = usePopover();
   const initial = useRef(false);
   const [count,setCount] = useState(0);
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [current, setCurrent] = useState(0);
 
   const [state, setState] = useState({
     right: false,
   });
+
 
   const toggleDrawer = (anchor, open) => (event) => {
     if (
@@ -102,7 +104,10 @@ export const TopNav = (props) => {
   }
 
   useEffect(() => {
-    async function fetchData(url) {
+    if (amount) {
+      setCurrent((prevCurrent) => prevCurrent + amount);
+    }
+    /* async function fetchData(url) {
       try {
         const res = await fetch(url);
         const data = await res.json();
@@ -118,9 +123,9 @@ export const TopNav = (props) => {
         console.log(initial.current);
         fetchData("http://localhost:5000/orders");
         fetchData('http://localhost:5000/orderPaids');
-      }
+      } */
       
-    }, []);
+    }, [amount]);
 
   return (
     <>
@@ -182,10 +187,10 @@ export const TopNav = (props) => {
                 </SvgIcon>
               </IconButton>
             </Tooltip> */}
-      {/* <Tooltip title="ตะกร้า">
+      <Tooltip title="ตะกร้า">
          <IconButton onClick={handleOrderPage}>
         <Badge
-          badgeContent={count}
+          badgeContent={current}
           color="success"
         >
           <SvgIcon fontSize="small">
@@ -193,9 +198,9 @@ export const TopNav = (props) => {
           </SvgIcon>
         </Badge>
       </IconButton>
-    </Tooltip> */}
+    </Tooltip>
 
-        <React.Fragment key={'right'}>
+        {/* <React.Fragment key={'right'}>
           <IconButton onClick={toggleDrawer('right', true)}>
             <SvgIcon fontSize="small">
               <ShoppingCartIcon />
@@ -209,7 +214,7 @@ export const TopNav = (props) => {
           >
             {list('right')}
           </SwipeableDrawer>
-        </React.Fragment>
+        </React.Fragment> */}
     {/* <Avatar
       onClick={accountPopover.handleOpen}
       ref={accountPopover.anchorRef}

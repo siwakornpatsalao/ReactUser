@@ -13,7 +13,9 @@ import {
   SvgIcon,
   Typography,
   Card,
-  useMediaQuery
+  useMediaQuery,
+  RadioGroup,
+  Radio
 } from '@mui/material';
 import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
@@ -25,7 +27,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
 export const SideNav = (props) => {
-  const { open, onClose } = props;
+  const { open, onClose} = props;
   const pathname = usePathname();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
   const auth = useAuth();
@@ -74,8 +76,7 @@ export const SideNav = (props) => {
             <br/>
             <Card>
               <CardContent>
-                เครปไส้แตก แป้ง ราคา จำนวน <br/>
-                test<br/>test<br/>test<br/>test<br/>test<br/>test<br/>test<br/>
+                <span style={{fontSize:25}}>เครปไส้แตก</span><br/> แป้ง: วนิลา<br/>ไส้: พริกเผา หมูหยอง ทูน่า ...<br/>ไส้พิเศษ: ไข่ไก่ <br/>ซอส: มะเขือเทศ มายองชีส<br/>ราคา 50 บาท  จำนวน 1 ชื้น
               </CardContent>
             </Card>
             <br/>
@@ -85,19 +86,19 @@ export const SideNav = (props) => {
                 วิธีการชำระเงิน
                 </Typography>
                 <br/>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox />} label={
+                <RadioGroup>
+                  <FormControlLabel value="qr" control={<Radio />} label={
                     <Typography variant="h6" component="h6">
                       Scan QR Code
                     </Typography>
                   } />
                     <br/>
-                  <FormControlLabel control={<Checkbox />} label={
+                  <FormControlLabel value="cash" control={<Radio />} label={
                     <Typography variant="h6" component="h6">
                       จ่ายเงินสด
                     </Typography>
                   } />
-                </FormGroup>
+                </RadioGroup>
               </CardContent>
             </Card>
 
