@@ -25,9 +25,24 @@ const LayoutContainer = styled('div')({
 });
 
 export const Layout = withAuthGuard((props) => {
-  const { children,sideClose,amount } = props;
+  const { children, sideClose, setSideClose, amount } = props;
   const pathname = usePathname();
   const [openNav, setOpenNav] = useState(false);
+  const [openSide, setOpenSide] = useState(false);
+  const [detailCheck, setDetailCheck] = useState(false);
+
+  const handleDataSend = (data) =>{
+    console.log('Received data:', data);
+    console.log(sideClose, 'sideClose');
+    console.log(openSide,'openSide');
+    console.log(detailCheck, 'detailCheck')
+    if(data){
+      setSideClose(!sideClose);
+      setOpenSide(!openSide);
+      setOpenNav(!openNav);
+      setDetailCheck(!detailCheck);
+    }
+  }
 
 
   const handlePathnameChange = useCallback(
@@ -44,24 +59,38 @@ export const Layout = withAuthGuard((props) => {
       handlePathnameChange();
       if(sideClose){
         console.log(sideClose,'tetstsetstset');
-        setOpenNav(false)
+        setOpenNav(false);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [pathname]
-  );
+  )
 
   return (
     <>
-      <TopNav onNavOpen={() => setOpenNav(true)} amount={amount}/>
-      {sideClose ? (
-        <>{children}</>) 
+      <TopNav onNavOpen={() => setOpenNav(true)} amount={amount} onSendData={handleDataSend}/>
+      {sideClose && !openSide ? (
+        <>
+        {children}
+        </>) : !sideClose && openSide && detailCheck ? (
+          <>
+          <SideNav
+          onClose={() => setOpenNav(false)}
+          open={openNav}
+          detailCheck={detailCheck}/> 
+{/*         <LayoutRoot>
+          <LayoutContainer>
+            {children}
+          </LayoutContainer>
+        </LayoutRoot> */}
+        {children}
+          </>
+        )
       : (
         <>
-        <SideNav
+      <SideNav
         onClose={() => setOpenNav(false)}
-        open={openNav}
-      /> 
+        open={openNav}/> 
       <LayoutRoot>
         <LayoutContainer>
           {children}

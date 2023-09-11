@@ -36,7 +36,7 @@ const TOP_NAV_HEIGHT = 70;
 
 
 export const TopNav = (props) => {
-  const { onNavOpen, amount } = props;
+  const { onNavOpen, amount, onSendData } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
   const accountPopover = usePopover();
   const initial = useRef(false);
@@ -100,30 +100,15 @@ export const TopNav = (props) => {
   );
 
   function handleOrderPage(){
-    // router.push('/order')
+    const dataToSend = { key: 'value' };
+    onSendData(dataToSend);
+    onNavOpen();
   }
 
   useEffect(() => {
     if (amount) {
       setCurrent((prevCurrent) => prevCurrent + amount);
     }
-    /* async function fetchData(url) {
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        setCount((prevCount) => prevCount + data.length);
-        console.log(data);
-      } catch (error) {
-        console.error(`Error fetching data from ${url}:`, error);
-      }
-    }
-  
-      if (!initial.current) {
-        initial.current = true;
-        console.log(initial.current);
-        fetchData("http://localhost:5000/orders");
-        fetchData('http://localhost:5000/orderPaids');
-      } */
       
     }, [amount]);
 
@@ -160,79 +145,42 @@ export const TopNav = (props) => {
             direction="row"
             spacing={2}
           >
-            {!lgUp && (
+            {/* {!lgUp && (
               <IconButton onClick={onNavOpen}>
                 <SvgIcon fontSize="small">
                   <Bars3Icon />
                 </SvgIcon>
               </IconButton>
-            )}
-            {/* <Tooltip title="Search">
-              <IconButton>
-                <SvgIcon fontSize="small">
-                  <MagnifyingGlassIcon />
-                </SvgIcon>
-              </IconButton>
-            </Tooltip> */}
+            )} */}
           </Stack>
           <Stack
             alignItems="center"
             direction="row"
             spacing={2}
           >
-            {/* <Tooltip title="Contacts">
-              <IconButton>
+            {!lgUp && (
+              <IconButton onClick={onNavOpen}>
                 <SvgIcon fontSize="small">
-                  <UsersIcon />
+                <ShoppingCartIcon />
                 </SvgIcon>
               </IconButton>
-            </Tooltip> */}
-      <Tooltip title="ตะกร้า">
-         <IconButton onClick={handleOrderPage}>
-        <Badge
-          badgeContent={current}
-          color="success"
-        >
-          <SvgIcon fontSize="small">
-            <ShoppingCartIcon />
-          </SvgIcon>
-        </Badge>
-      </IconButton>
-    </Tooltip>
+            )} 
+            {lgUp && (
+              <Tooltip title="ตะกร้า">
+                <IconButton onClick={handleOrderPage}>
+                <Badge
+                  badgeContent={current}
+                  color="success"
+                >
+                  <SvgIcon fontSize="small">
+                    <ShoppingCartIcon />
+                  </SvgIcon>
+                </Badge>
+              </IconButton>
+            </Tooltip>
+            )}
+      
 
-        {/* <React.Fragment key={'right'}>
-          <IconButton onClick={toggleDrawer('right', true)}>
-            <SvgIcon fontSize="small">
-              <ShoppingCartIcon />
-            </SvgIcon>
-          </IconButton>
-          <SwipeableDrawer
-            anchor={'right'}
-            open={state['right']}
-            onClose={toggleDrawer('right', false)}
-            onOpen={toggleDrawer('right', true)}
-          >
-            {list('right')}
-          </SwipeableDrawer>
-        </React.Fragment> */}
-    {/* <Avatar
-      onClick={accountPopover.handleOpen}
-      ref={accountPopover.anchorRef}
-      sx={{
-         cursor: 'pointer',
-         height: 40,
-         width: 40
-         }}
-        src="/assets/avatars/avatar-anika-visser.png"
-         /> */}
-
-      {/* <SvgIcon 
-        onClick={accountPopover.handleOpen}
-        ref={accountPopover.anchorRef} 
-        sx={{cursor: 'pointer'}}
-        ontSize="small">
-          <UsersIcon />
-      </SvgIcon> */}
           </Stack>
         </Stack>
       </Box>

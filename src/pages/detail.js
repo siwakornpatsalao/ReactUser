@@ -31,8 +31,37 @@ export default function Detail(){
         }
     }
 
-    function addToCart(){
-        setCartAmount(amount);
+    const handleNoteChange = (event) => {
+        setNote(event.target.value);
+    };
+
+    async function addToCart(){
+        if(amount>0){
+            const response = await fetch("http://localhost:5000/carts", {
+                method: "POST",
+                body: JSON.stringify({
+                  name: item.name,
+                  price: item.price,
+                  addonId: selectedAddons,
+                  optionGroupId: selectedOptionGroups,
+                  amount: amount,
+                  note: note,
+                }),
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              });
+              if (!response.ok) {
+                throw new Error("Failed to add new menu");
+              }
+              
+              const resJson = await response.json();
+              console.log(resJson);
+      
+              setCartAmount(amount);
+              setAmount(0);
+              setNote('');
+        }
     }
 
     function handlePlus(){
@@ -93,7 +122,7 @@ export default function Detail(){
     }, [addons,optionGroups, id, item.addonId, item.optionGroupId]);
 
     return(
-        <DashboardLayout sideClose={sideClose} amount={cartAmount}>
+        <DashboardLayout sideClose={sideClose} setSideClose={setSideClose} amount={cartAmount}>
         <Box component="main" /* sx={{ backgroundColor: '#D3D3D3'}} */>
          <Container maxWidth="x">
          <br/>
@@ -124,6 +153,7 @@ export default function Detail(){
                     maxWidth: '100%',}}
                     src={item.thumbnail}
                 />
+                
                 {/* เพิ่มจำนวนสินค้า */}
                 
             </Grid>
@@ -221,6 +251,7 @@ export default function Detail(){
                     Note: <TextField focused fullWidth
                             label="หมายเหตุสำหรับร้านค้า"
                             value={note}
+                            onChange={handleNoteChange}
                             name="name" sx={{ marginLeft: '10px' }}/>
                 </Typography>
                 <br/>
