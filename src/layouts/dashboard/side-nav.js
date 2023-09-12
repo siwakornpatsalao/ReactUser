@@ -1,31 +1,30 @@
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import PropTypes from 'prop-types';
-import ArrowTopRightOnSquareIcon from '@heroicons/react/24/solid/ArrowTopRightOnSquareIcon';
-import ChevronUpDownIcon from '@heroicons/react/24/solid/ChevronUpDownIcon';
 import {
   Box,
   Button,
   CardContent,
-  Divider,
   Drawer,
   Stack,
-  SvgIcon,
   Typography,
   Card,
   useMediaQuery,
   RadioGroup,
-  Radio
+  Radio,
+  IconButton
 } from '@mui/material';
-import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
-import { items } from './config';
-import { SideNavItem } from './side-nav-item';
 import { useAuth } from 'src/hooks/use-auth';
-import Checkbox from '@mui/material/Checkbox';
-import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import React, { useState, useRef, useEffect } from 'react';
+import CloseIcon from '@mui/icons-material/Close';
+import Swal from "sweetalert2";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import ListItemText from '@mui/material/ListItemText';
 
 export const SideNav = (props) => {
   const { open, onClose, detailCheck} = props;
@@ -38,21 +37,41 @@ export const SideNav = (props) => {
   const [selectedOptionGroups, setSelectedOptionGroups] = useState([]); */
   const [addon, setAddon] = useState([]);
   const [optionGroup, setOptionGroup] = useState([]);
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   function handlePay(){
     setCart([]);
   }
 
-  useEffect(() => {
+  function handleOpenDeleteDialog(){
+    setDeleteDialogOpen(true);
+  }
+
+  async function handleDeleteCart(item){
+    try {
+      const response = await fetch(`http://localhost:5000/carts/${item._id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to delete cart");
+      }
+      fetchCart();
+      setDeleteDialogOpen(false);
+      //setNewAmount
+    } catch (error) {
+      console.error("Error deleting cart:", error);
+    }
+  }
+
   async function fetchCart() {
     try {
       const res = await fetch("http://localhost:5000/carts");
       const data = await res.json();
       setCart(data);
-/*       const addonIds = data.map((dataItem) => dataItem.addonId);
-      const optionGroupIds = data.map((dataItem) => dataItem.optionGroupId);
-      setSelectedAddons(addonIds);
-      setSelectedOptionGroups(optionGroupIds); */
       console.log(data, 'cart');
       console.log(data.map((dataItem) => dataItem.addonId), 'cart2');
       console.log(data.map((dataItem) => dataItem.optionGroupId), 'cart3');
@@ -60,6 +79,8 @@ export const SideNav = (props) => {
       console.error("Error fetching carts:", error);
     }
   }
+
+  useEffect(() => {
 
   async function fetchAddon() {
     try {
@@ -142,6 +163,7 @@ export const SideNav = (props) => {
               <div key={cartItem.id}>
                 <Card>
                   <CardContent>
+                  <IconButton onClick={() => handleOpenDeleteDialog()}><CloseIcon/></IconButton><br/>
                     <span style={{ fontSize: 25, fontWeight: 'bold' }}>{cartItem.name}</span>
                     <br/><span style={{ fontSize: 20 }}>เมนูเพิ่มเติม:</span> {addon
                                                             .filter((addonItem) => cartItem.addonId.includes(addonItem._id))
@@ -163,7 +185,27 @@ export const SideNav = (props) => {
                   </CardContent>
                 </Card>
                 <br/>
+
+                <Dialog
+                  sx={{ '& .MuiDialog-paper': { width: '80%', maxHeight: 435 } }}
+                  maxWidth="xs"
+                  open={isDeleteDialogOpen}
+                  onClose={() => setDeleteDialogOpen(false)}
+                >
+                  <DialogTitle sx={{fontSize:25}}>ต้องการลบสินค้านี้หรือไม่</DialogTitle>
+
+                  <DialogActions>
+                    <Button onClick={() => setDeleteDialogOpen(false)}>ยกเลิก</Button>
+                    <Button onClick={() => handleDeleteCart(cartItem)} color="error">
+                      ยืนยัน
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+
               </div>
+
+
+
             ))}
 
             <br/>
@@ -310,7 +352,6 @@ export const SideNav = (props) => {
       </Drawer>
     );
   }
-
 
 
   return (

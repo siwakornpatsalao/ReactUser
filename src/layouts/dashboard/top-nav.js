@@ -44,6 +44,8 @@ export const TopNav = (props) => {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState(0);
+  const [cart, setCart] = useState([]);
+  const [cartCount, setCartCount] = useState(0);
 
   const [state, setState] = useState({
     right: false,
@@ -109,6 +111,30 @@ export const TopNav = (props) => {
     if (amount) {
       setCurrent((prevCurrent) => prevCurrent + amount);
     }
+
+    async function fetchCart() {
+      try {
+        const res = await fetch("http://localhost:5000/carts");
+        const data = await res.json();
+        setCart(data);
+        let totalAmount = 0;
+        data.forEach((dataItem) => {
+          totalAmount += dataItem.amount;
+        });
+        setCartCount(totalAmount);
+        console.log(data, 'cartTopNav');
+        console.log("Total amount in cart:", totalAmount);
+
+      } catch (error) {
+        console.error("Error fetching carts:", error);
+      }
+    }
+
+    if (!initial.current) {
+      initial.current = true;
+      console.log(initial.current);
+      fetchCart(); 
+    }
       
     }, [amount]);
 
@@ -160,16 +186,21 @@ export const TopNav = (props) => {
           >
             {!lgUp && (
               <IconButton onClick={onNavOpen}>
+                <Badge
+                  badgeContent={cartCount+current}
+                  color="success"
+                >
                 <SvgIcon fontSize="small">
                 <ShoppingCartIcon />
                 </SvgIcon>
+                </Badge>
               </IconButton>
             )} 
             {lgUp && (
               <Tooltip title="ตะกร้า">
                 <IconButton onClick={handleOrderPage}>
                 <Badge
-                  badgeContent={current}
+                  badgeContent={cartCount+current}
                   color="success"
                 >
                   <SvgIcon fontSize="small">

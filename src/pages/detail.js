@@ -20,6 +20,7 @@ export default function Detail(){
     const [note, setNote] = useState('');
     const [sideClose, setSideClose] = useState(true);
     const [cartAmount, setCartAmount] = useState(0);
+    const [cartItem, setCartItem] = useState([]);
 
     function handleBack(){
         router.back();
@@ -35,34 +36,91 @@ export default function Detail(){
         setNote(event.target.value);
     };
 
+    async function fetchCart(){
+        try {
+            const res = await fetch(`http://localhost:5000/carts`);
+            const data = await res.json();
+            setCartItem(data);
+            console.log(data,'cartDetail');
+          } catch (error) {
+            console.error("Error fetching cartItems:", error);
+          }
+    }
+
     async function addToCart(){
-        if(amount>0){
-            const response = await fetch("http://localhost:5000/carts", {
-                method: "POST",
-                body: JSON.stringify({
-                  name: item.name,
-                  price: item.price,
-                  addonId: selectedAddons,
-                  optionGroupId: selectedOptionGroups,
-                  amount: amount,
-                  note: note,
-                }),
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              });
-              if (!response.ok) {
-                throw new Error("Failed to add new menu");
-              }
-              
-              const resJson = await response.json();
-              console.log(resJson);
-      
-              setCartAmount(amount);
-              setAmount(0);
-              setNote('');
+        //check ค่านั้นๆก่อน ถ้าเหมือนทุกอย่างจะเพิ่มจำนวนแทน return
+        fetchCart();
+
+        const checkCart = cartItem.find((cart) => {
+            return (
+                cart.name === item.name &&
+                cart.price === item.price  &&
+                cart.note === note
+              /* &&
+              cart.addonId === selectedAddons &&
+              cart.optionGroupId === selectedOptionGroups */
+            );
+          });
+
+          console.log(checkCart,'sameCartCheck1')
+
+        if(checkCart!=null){
+            console.log(checkCart,'sameCartCheckHave')
+            console.log('have same cart')
+            if(amount>0){
+                const response = await fetch(`http://localhost:5000/carts/${checkCart._id}`, {
+                    method: "PUT",
+                    body: JSON.stringify({
+                      amount: checkCart.amount + amount,
+                    }),
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                  });
+                  if (!response.ok) {
+                    throw new Error("Failed to edit cart");
+                  }
+                  
+                  const resJson = await response.json();
+                  console.log(resJson);
+
+                  fetchCart();
+                  setCartAmount(amount);
+                  setAmount(0);
+                  setNote('');
+            }
+        }else if(checkCart==null){
+            console.log(checkCart,'sameCartCheckNull')
+            if(amount>0){
+                const response = await fetch("http://localhost:5000/carts", {
+                    method: "POST",
+                    body: JSON.stringify({
+                      name: item.name,
+                      price: item.price,
+                      addonId: selectedAddons,
+                      optionGroupId: selectedOptionGroups,
+                      amount: amount,
+                      note: note,
+                    }),
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                  });
+                  if (!response.ok) {
+                    throw new Error("Failed to add new cart");
+                  }
+                  
+                  const resJson = await response.json();
+                  console.log(resJson);
+          
+                  fetchCart();
+                  setCartAmount(amount);
+                  setAmount(0);
+                  setNote('');
+            }
         }
     }
+
 
     function handlePlus(){
         setAmount(amount+1);
@@ -252,7 +310,7 @@ export default function Detail(){
                             label="หมายเหตุสำหรับร้านค้า"
                             value={note}
                             onChange={handleNoteChange}
-                            name="name" sx={{ marginLeft: '10px' }}/>
+                            name="name" inputProps={{style: {fontSize: 20}}} sx={{ marginLeft: '10px' }}/>
                 </Typography>
                 <br/>
                 <Typography variant="h4" component="h4" sx={{display:'flex', justifyContent:'center'}}>
