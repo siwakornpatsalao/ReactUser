@@ -49,13 +49,28 @@ export default function Detail(){
 
     async function addToCart(){
         //check ค่านั้นๆก่อน ถ้าเหมือนทุกอย่างจะเพิ่มจำนวนแทน return
-        fetchCart();
 
-        const checkCart = cartItem.find((cart) => {
+        const response = await fetch(`http://localhost:5000/carts/`, {
+            method: "GET",
+            headers: {
+            "Content-Type": "application/json",
+            },
+        });
+    
+        if (!response.ok) {
+            throw new Error("Failed to delete cart");
+        }
+
+        const resJson = await response.json();
+        console.log(resJson,'dataInDetail');
+
+        setCartItem(resJson)
+
+        /*let */ const checkCart = cartItem.find((cart) => {
             return (
                 cart.name === item.name &&
                 cart.price === item.price  &&
-                cart.note === note
+                cart.note === note 
               /* &&
               cart.addonId === selectedAddons &&
               cart.optionGroupId === selectedOptionGroups */
@@ -64,7 +79,7 @@ export default function Detail(){
 
           console.log(checkCart,'sameCartCheck1')
 
-        if(checkCart!=null){
+        if(checkCart){
             console.log(checkCart,'sameCartCheckHave')
             console.log('have same cart')
             if(amount>0){
@@ -88,6 +103,7 @@ export default function Detail(){
                   setCartAmount(amount);
                   setAmount(0);
                   setNote('');
+                  /* checkCart = null */
             }
         }else if(checkCart==null){
             console.log(checkCart,'sameCartCheckNull')
@@ -117,6 +133,7 @@ export default function Detail(){
                   setCartAmount(amount);
                   setAmount(0);
                   setNote('');
+                  //   checkCart = null
             }
         }
     }
@@ -169,6 +186,7 @@ export default function Detail(){
 
         if (!initial.current) {
             console.log(initial.current);
+            fetchCart();
             fetchItem();
         }
 
@@ -177,6 +195,8 @@ export default function Detail(){
             fetchOptions();
             initial.current = true;
         }
+
+
     }, [addons,optionGroups, id, item.addonId, item.optionGroupId]);
 
     return(
@@ -227,9 +247,16 @@ export default function Detail(){
                     {addons.map((addon) => (
                         <FormGroup key={addon._id}>
                         <FormControlLabel
-                        label={<Typography variant="h5" component="h5" style={{ color: 'black', fontWeight: "normal" ,whiteSpace: "pre-wrap",}}>
-                        {addon.name}
-                                </Typography>}
+                        label={
+                        <>
+                        <Typography variant="h5" component="h5" style={{ color: 'black', fontWeight: "normal" ,whiteSpace: "pre-wrap",}}>
+                          {addon.name}
+                        </Typography>
+                                <Typography variant="h6" component="h6" sx={{marginTop:'5px'}} style={{ color: 'black', fontWeight: "normal",fontSize:20 }}>
+                                    <span style={{color:'grey', fontSize:20}}>+{addon.price} บาท</span>
+                                </Typography>
+                         </>
+                            }
                             control={
                             <Checkbox
                                 checked={selectedAddons.includes(addon._id)}

@@ -36,7 +36,7 @@ const TOP_NAV_HEIGHT = 70;
 
 
 export const TopNav = (props) => {
-  const { onNavOpen, amount, onSendData } = props;
+  const { onNavOpen, amount, onSendData, countItem } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
   const accountPopover = usePopover();
   const initial = useRef(false);
@@ -112,6 +112,16 @@ export const TopNav = (props) => {
       setCurrent((prevCurrent) => prevCurrent + amount);
     }
 
+
+    console.log(countItem,'countItem3');
+    console.log(cartCount, 'cartCount3');
+    if(countItem<=cartCount && countItem!=0 && cartCount!=0){
+      console.log(countItem,'countItem2');
+      console.log(cartCount, 'cartCount2');
+      setCartCount(countItem);
+      setCurrent(0);
+    }
+
     async function fetchCart() {
       try {
         const res = await fetch("http://localhost:5000/carts");
@@ -123,8 +133,8 @@ export const TopNav = (props) => {
         });
         setCartCount(totalAmount);
         console.log(data, 'cartTopNav');
+        console.log(countItem,'testttttt')
         console.log("Total amount in cart:", totalAmount);
-
       } catch (error) {
         console.error("Error fetching carts:", error);
       }
@@ -133,10 +143,11 @@ export const TopNav = (props) => {
     if (!initial.current) {
       initial.current = true;
       console.log(initial.current);
-      fetchCart(); 
+      fetchCart();
     }
       
-    }, [amount]);
+
+    }, [amount,countItem,cartCount]);
 
   return (
     <>

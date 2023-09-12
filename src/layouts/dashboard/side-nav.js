@@ -27,7 +27,7 @@ import DialogActions from "@mui/material/DialogActions";
 import ListItemText from '@mui/material/ListItemText';
 
 export const SideNav = (props) => {
-  const { open, onClose, detailCheck} = props;
+  const { open, onClose, detailCheck, onDataSend} = props;
   const pathname = usePathname();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
   const auth = useAuth();
@@ -47,6 +47,7 @@ export const SideNav = (props) => {
     setDeleteDialogOpen(true);
   }
 
+
   async function handleDeleteCart(item){
     try {
       const response = await fetch(`http://localhost:5000/carts/${item._id}`, {
@@ -59,12 +60,32 @@ export const SideNav = (props) => {
       if (!response.ok) {
         throw new Error("Failed to delete cart");
       }
-      fetchCart();
+
+      const response2 = await fetch(`http://localhost:5000/carts/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (!response2.ok) {
+        throw new Error("Failed to delete cart");
+      }
+
+      const resJson = await response2.json();
+      console.log(resJson,'data');
       setDeleteDialogOpen(false);
+      handleDataSend(resJson);
+      setCart(resJson);
       //setNewAmount
     } catch (error) {
       console.error("Error deleting cart:", error);
     }
+  }
+
+  function handleDataSend(data) {
+    // Call the function onDataSend with the data you want to send back
+    props.onDataSend(data);
   }
 
   async function fetchCart() {
@@ -81,7 +102,6 @@ export const SideNav = (props) => {
   }
 
   useEffect(() => {
-
   async function fetchAddon() {
     try {
       const res = await fetch("http://localhost:5000/addons");
@@ -326,7 +346,7 @@ export const SideNav = (props) => {
           sx: {
             backgroundColor: 'neutral.800',
             color: 'common.white',
-            width: 400
+            width: 500
           }
         }}
         sx={{ zIndex: (theme) => theme.zIndex.appBar + 100 }}

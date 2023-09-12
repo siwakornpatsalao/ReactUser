@@ -32,6 +32,7 @@ export const Layout = withAuthGuard((props) => {
   const [detailCheck, setDetailCheck] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const initial = useRef(false);
+  const [cart, setCart] = useState([]);
 
   const handleDataSend = (data) =>{
     console.log('Received data:', data);
@@ -47,10 +48,15 @@ export const Layout = withAuthGuard((props) => {
   }
 
 
-  const handleCart = (cart) =>{
-    if(cart){
-      //setCount(0);
-    }
+  const handleCart = (data) =>{
+    console.log('Data received from SideNav:', data);
+    setCart(data);
+    let totalAmount = 0;
+    data.forEach((dataItem) => {
+      totalAmount += dataItem.amount;
+    });
+    setCartCount(totalAmount);
+    console.log(totalAmount,'cartCount');
   }
 
 
@@ -75,7 +81,6 @@ export const Layout = withAuthGuard((props) => {
         try {
           const res = await fetch("http://localhost:5000/carts");
           const data = await res.json();
-          setCartCount(data.length);
           console.log(data, 'cart');
         } catch (error) {
           console.error("Error fetching carts:", error);
@@ -94,7 +99,7 @@ export const Layout = withAuthGuard((props) => {
 
   return (
     <>
-      <TopNav onNavOpen={() => setOpenNav(true)} amount={amount} onSendData={handleDataSend}/>
+      <TopNav onNavOpen={() => setOpenNav(true)} amount={amount} onSendData={handleDataSend} countItem={cartCount}/>
       {sideClose && !openSide ? (
         <>
         {children}
@@ -103,7 +108,8 @@ export const Layout = withAuthGuard((props) => {
           <SideNav
           onClose={() => setOpenNav(false)}
           open={openNav}
-          detailCheck={detailCheck}/> 
+          detailCheck={detailCheck}
+          onDataSend={handleCart}/> 
 {/*         <LayoutRoot>
           <LayoutContainer>
             {children}
