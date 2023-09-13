@@ -21,15 +21,60 @@ export default function Detail(){
     const [sideClose, setSideClose] = useState(true);
     const [cartAmount, setCartAmount] = useState(0);
     const [cartItem, setCartItem] = useState([]);
+    const [itemPrice, setItemPrice] = useState(0);
+    const [tempPrice, setTempPrice] = useState(0);
 
     function handleBack(){
         router.back();
     }
 
     function handleMinus(){
-        if(amount>0){
-            setAmount(amount-1);
+      if (amount >= 1) {
+        setAmount(amount - 1);
+        if(amount>1){
+          setItemPrice(tempPrice * (amount - 1));
         }
+      }
+    }
+
+    function handlePlus(){
+      setAmount(amount + 1);
+      setItemPrice(tempPrice * (amount + 1));
+    }
+
+    function handleAddPriceAddon(addonPrice, addon) {
+      setTempPrice(tempPrice+addonPrice);
+
+      const updatedItemPrice = selectedAddons.includes(addon._id)
+        ? tempPrice - addonPrice
+        : tempPrice + addonPrice;
+      
+      if(amount==0){
+        setItemPrice(updatedItemPrice);
+        setTempPrice(updatedItemPrice);
+        return;
+      }
+      setItemPrice(updatedItemPrice*amount);
+      setTempPrice(updatedItemPrice);
+      console.log(updatedItemPrice, 'addon');
+    }
+
+    function handleAddPriceOption(optionGroupPrice,option){
+      setTempPrice(tempPrice+optionGroupPrice);
+      
+      const updatedItemPrice = selectedOptionGroups.includes(option._id)
+        ? tempPrice - optionGroupPrice
+        : tempPrice + optionGroupPrice;
+
+      if(amount==0){
+        setItemPrice(updatedItemPrice);
+        setTempPrice(updatedItemPrice);
+        return;
+      }
+        setItemPrice(updatedItemPrice*amount);
+        setTempPrice(updatedItemPrice);
+
+      console.log(updatedItemPrice, 'optionGroup')
     }
 
     const handleNoteChange = (event) => {
@@ -66,16 +111,19 @@ export default function Detail(){
 
         setCartItem(resJson)
 
+        console.log(selectedAddons,'addonSelect');
+        console.log(selectedOptionGroups,'optionSelect');
+
         /*let */ const checkCart = cartItem.find((cart) => {
             return (
                 cart.name === item.name &&
-                cart.price === item.price  &&
-                cart.note === note 
-              /* &&
-              cart.addonId === selectedAddons &&
-              cart.optionGroupId === selectedOptionGroups */
+                cart.note === note &&
+                cart.addonId === selectedAddons &&
+                cart.optionGroupId === selectedOptionGroups 
             );
           });
+
+          setItemPrice(itemPrice*amount);
 
           console.log(checkCart,'sameCartCheck1')
 
@@ -87,6 +135,7 @@ export default function Detail(){
                     method: "PUT",
                     body: JSON.stringify({
                       amount: checkCart.amount + amount,
+                      price: checkCart.price + itemPrice,
                     }),
                     headers: {
                       "Content-Type": "application/json",
@@ -103,6 +152,10 @@ export default function Detail(){
                   setCartAmount(amount);
                   setAmount(0);
                   setNote('');
+                  setSelectedAddons([]);
+                  setSelectedOptionGroups([]);
+                  setItemPrice(item.price);
+                  setTempPrice(item.price);
                   /* checkCart = null */
             }
         }else if(checkCart==null){
@@ -112,7 +165,7 @@ export default function Detail(){
                     method: "POST",
                     body: JSON.stringify({
                       name: item.name,
-                      price: item.price,
+                      price: itemPrice,
                       addonId: selectedAddons,
                       optionGroupId: selectedOptionGroups,
                       amount: amount,
@@ -133,14 +186,13 @@ export default function Detail(){
                   setCartAmount(amount);
                   setAmount(0);
                   setNote('');
+                  setSelectedAddons([]);
+                  setSelectedOptionGroups([]);
+                  setItemPrice(item.price);
+                  setTempPrice(item.price);
                   //   checkCart = null
             }
         }
-    }
-
-
-    function handlePlus(){
-        setAmount(amount+1);
     }
     
 
@@ -150,6 +202,8 @@ export default function Detail(){
             const res = await fetch(`http://localhost:5000/menus/${id}`);
             const data = await res.json();
             setItem(data);
+            setItemPrice(data.price);
+            setTempPrice(data.price);
             console.log(data,'item');
           } catch (error) {
             console.error("Error fetching menus:", error);
@@ -222,7 +276,7 @@ export default function Detail(){
 
           <Grid container justifyContent="space-between" alignItems="flex-start" spacing={2} sx={{ marginTop: 2 }}>
             <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
-                <Typography variant="h4" component="h4">
+                <Typography variant="h4" component="h4" >
                     {item.name}
                 </Typography>
                 <br/>
@@ -233,8 +287,8 @@ export default function Detail(){
                 />
                 
                 {/* เพิ่มจำนวนสินค้า */}
-                
             </Grid>
+
             <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
                 <Box sx={{ paddingLeft: { xs: 4, sm: 2, md: 3, lg: 4, xl: 5 } }}>
                     {item.addonId && item.addonId.length>0 && (
@@ -259,14 +313,14 @@ export default function Detail(){
                             }
                             control={
                             <Checkbox
-                                checked={selectedAddons.includes(addon._id)}
-                                onChange={() =>
+                                checked={selectedAddons.includes(addon._id) }
+                                onChange={() => {
                                 setSelectedAddons((prev) =>
                                     prev.includes(addon._id)
                                     ? prev.filter((id) => id !== addon._id)
                                     : [...prev, addon._id]
-                                )
-                                }
+                                ); handleAddPriceAddon(addon.price,addon)
+                                }}
                             />
                             }
                         />
@@ -307,13 +361,13 @@ export default function Detail(){
                                         control={
                                             <Checkbox
                                             checked={selectedOptionGroups.includes(optionSet._id)}
-                                            onChange={() =>
+                                            onChange={() => {
                                                 setSelectedOptionGroups((prev) =>
                                                 prev.includes(optionSet._id)
                                                     ? prev.filter((id) => id !== optionSet._id)
                                                     : [...prev, optionSet._id]
-                                                )
-                                            }
+                                                ); handleAddPriceOption(optionSet.price,optionSet)
+                                            }}
                                             />
                                         }
                                         />
@@ -350,8 +404,8 @@ export default function Detail(){
                     </Button>
                     </Typography>
                 <br/>
-                <Button fullWidth variant="contained" onClick={addToCart}>
-                    ซื้อสินค้า {/* {item.price} บาท */}
+                <Button sx={{fontSize:25}} fullWidth variant="contained" onClick={addToCart}>
+                    ซื้อสินค้า {itemPrice} บาท {/* ราคา + เมนูเพิ่มเติ่ม + ตัวเลือก */}
                 </Button>
                 </Box>
             </Grid>

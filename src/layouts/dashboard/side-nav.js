@@ -43,7 +43,7 @@ export const SideNav = (props) => {
     setCart([]);
   }
 
-  function handleOpenDeleteDialog(){
+  function handleOpenDeleteDialog() {
     setDeleteDialogOpen(true);
   }
 
@@ -185,21 +185,36 @@ export const SideNav = (props) => {
                   <CardContent>
                   <IconButton onClick={() => handleOpenDeleteDialog()}><CloseIcon/></IconButton><br/>
                     <span style={{ fontSize: 25, fontWeight: 'bold' }}>{cartItem.name}</span>
-                    <br/><span style={{ fontSize: 20 }}>เมนูเพิ่มเติม:</span> {addon
-                                                            .filter((addonItem) => cartItem.addonId.includes(addonItem._id))
-                                                            .map((matchingAddonItem) => (
-                                                              <div key={matchingAddonItem._id}>
-                                                                <span>{matchingAddonItem.name}</span>
-                                                              </div>
-                                                            ))}
-                    <br/> <span style={{ fontSize: 20 }}>ตัวเลือก:</span> list ตัวเลือก 
-{/*                                                       {optionGroup.filter((optionItem)=>cartItem.optionGroupId.includes(optionItem.options._id))
-                                                            .map((matchingOptionItem) => (
-                                                              <div key={matchingOptionItem._id}>
-                                                                <span>{matchingOptionItem.name}</span>
-                                                              </div>
-                                                            ))} */}
-                    <br/> <span style={{ fontSize: 20 }}>Note:</span> {cartItem.note}
+                    {cartItem.addonId.length>0 &&
+                                                    <>
+                                                     <br/>
+                                                 <span style={{ fontSize: 20 }}>เมนูเพิ่มเติม:</span>
+                                                    {addon.filter((addonItem) => cartItem.addonId.includes(addonItem._id))
+                                                          .map((matchingAddonItem) => (
+                                                          <div key={matchingAddonItem._id}>
+                                                             <span style={{marginLeft:'10px'}}>{matchingAddonItem.name}</span>   
+                                                          </div>))}
+                                                    </>}
+                    {cartItem.optionGroupId.length>0 &&
+                                                    <>
+                                                    <br/> 
+                                                    <span style={{ fontSize: 20 }}>ตัวเลือก:</span> {optionGroup.map((option) => (
+                                                                <div key={option._id}>
+                                                                  {option.options && 
+                                                                    option.options
+                                                                      .filter((optionItem) =>
+                                                                        cartItem.optionGroupId.includes(optionItem._id)
+                                                                      )
+                                                                      .map((matchOption,index) => (
+                                                                        <div key={matchOption._id}>
+                                                                          {index==0 && <span>{option.name}: <br/></span>}
+                                                                          <span style={{marginLeft:'15px'}}>{matchOption.name}</span>
+                                                                        </div>
+                                                                      ))}
+                                                                </div>
+                                                              ))}
+                                                    </>}
+                    {cartItem.note && <><br/><span style={{ fontSize: 20 }}>Note:</span> {cartItem.note}</>}
                     <br/> <span style={{ fontSize: 20 }}>ราคา:</span> {cartItem.price} บาท
                     <br/> <span style={{ fontSize: 20 }}>จำนวน:</span> {cartItem.amount} ชิ้น
                   </CardContent>
