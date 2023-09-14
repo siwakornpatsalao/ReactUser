@@ -25,6 +25,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import ListItemText from '@mui/material/ListItemText';
+import Link from 'next/link';
 
 export const SideNav = (props) => {
   const { open, onClose, detailCheck, onDataSend} = props;
@@ -84,7 +85,6 @@ export const SideNav = (props) => {
   }
 
   function handleDataSend(data) {
-    // Call the function onDataSend with the data you want to send back
     props.onDataSend(data);
   }
 
@@ -93,9 +93,9 @@ export const SideNav = (props) => {
       const res = await fetch("http://localhost:5000/carts");
       const data = await res.json();
       setCart(data);
-      console.log(data, 'cart');
+/*       console.log(data, 'cart');
       console.log(data.map((dataItem) => dataItem.addonId), 'cart2');
-      console.log(data.map((dataItem) => dataItem.optionGroupId), 'cart3');
+      console.log(data.map((dataItem) => dataItem.optionGroupId), 'cart3'); */
     } catch (error) {
       console.error("Error fetching carts:", error);
     }
@@ -107,7 +107,7 @@ export const SideNav = (props) => {
       const res = await fetch("http://localhost:5000/addons");
       const data = await res.json();
       setAddon(data);
-      console.log(data, 'addon');
+/*       console.log(data, 'addon'); */
     } catch (error) {
       console.error("Error fetching addon:", error);
     }
@@ -118,7 +118,7 @@ export const SideNav = (props) => {
       const res = await fetch("http://localhost:5000/optiongroups");
       const data = await res.json();
       setOptionGroup(data);
-      console.log(data, 'optionGroup');
+      /* console.log(data, 'optionGroup'); */
     } catch (error) {
       console.error("Error fetching option:", error);
     }
@@ -184,6 +184,9 @@ export const SideNav = (props) => {
                 <Card>
                   <CardContent>
                   <IconButton onClick={() => handleOpenDeleteDialog()}><CloseIcon/></IconButton><br/>
+                  <Link href={`/editCart?id=${cartItem._id}`} >
+                    <Button>แก้ไข</Button>
+                  </Link>
                     <span style={{ fontSize: 25, fontWeight: 'bold' }}>{cartItem.name}</span>
                     {cartItem.addonId.length>0 &&
                                                     <>

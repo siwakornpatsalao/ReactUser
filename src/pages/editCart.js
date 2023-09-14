@@ -7,120 +7,96 @@ import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 
-export default function Detail(){
+export default function EditCart(){
     const router = useRouter();
     const { id } = router.query;
     const initial = useRef(false);
     const [item, setItem] = useState([]);
+    const [defaultItem, setDefaultItem] = useState([]);
     const [addons, setAddons] = useState([]);
     const [optionGroups, setOptionGroups] = useState([]);
     const [selectedAddons, setSelectedAddons] = useState([]);
     const [selectedOptionGroups, setSelectedOptionGroups] = useState([]);
     const [amount, setAmount] = useState(0);
     const [note, setNote] = useState('');
-    const [sideClose, setSideClose] = useState(true);
-    const [cartAmount, setCartAmount] = useState(0);
-    const [cartItem, setCartItem] = useState([]);
     const [itemPrice, setItemPrice] = useState(0);
     const [tempPrice, setTempPrice] = useState(0);
+    const [sideClose, setSideClose] = useState(true);
+    const [cartAmount, setCartAmount] = useState(0);
+    const [addonPrice, setAddonPrice] = useState(0);
+    const [optionPrice, setOptionPrice] = useState(0);
+    const [count, setCount] = useState(0);
 
+    
     function handleBack(){
         router.back();
-    }
-
-    function handleMinus(){
-      if (amount >= 1) {
-        setAmount(amount - 1);
-        if(amount>1){
-          setItemPrice(tempPrice * (amount - 1));
-        }
-      }
-    }
-
-    function handlePlus(){
-      setAmount(amount + 1);
-      setItemPrice(tempPrice * (amount + 1));
-    }
-
-    function handleAddPriceAddon(addonPrice, addon) {
-      setTempPrice(tempPrice+addonPrice);
-
-      const updatedItemPrice = selectedAddons.includes(addon._id)
-        ? tempPrice - addonPrice
-        : tempPrice + addonPrice;
-      
-      if(amount==0){
-        setItemPrice(updatedItemPrice);
-        setTempPrice(updatedItemPrice);
-        return;
-      }
-      setItemPrice(updatedItemPrice*amount);
-      setTempPrice(updatedItemPrice);
-      console.log(updatedItemPrice, 'addon');
-    }
-
-    function handleAddPriceOption(optionGroupPrice,option){
-      setTempPrice(tempPrice+optionGroupPrice);
-      
-      const updatedItemPrice = selectedOptionGroups.includes(option._id)
-        ? tempPrice - optionGroupPrice
-        : tempPrice + optionGroupPrice;
-
-      if(amount==0){
-        setItemPrice(updatedItemPrice);
-        setTempPrice(updatedItemPrice);
-        return;
-      }
-        setItemPrice(updatedItemPrice*amount);
-        setTempPrice(updatedItemPrice);
-
-      console.log(updatedItemPrice, 'optionGroup')
     }
 
     const handleNoteChange = (event) => {
         setNote(event.target.value);
     };
 
-    async function fetchCart(){
-        try {
-            const res = await fetch(`http://localhost:5000/carts`);
-            const data = await res.json();
-            setCartItem(data);
-            console.log(data,'cartDetail');
-          } catch (error) {
-            console.error("Error fetching cartItems:", error);
+    function handleMinus(){
+        if (amount >= 1) {
+          setAmount(amount - 1);
+          if(amount>1){
+            setItemPrice(tempPrice * (amount - 1));
           }
+        }
+    }
+  
+    function handlePlus(){
+        setAmount(amount + 1);
+        setItemPrice(tempPrice * (amount + 1));
     }
 
-    async function addToCart(){
-        //check ค่านั้นๆก่อน ถ้าเหมือนทุกอย่างจะเพิ่มจำนวนแทน return
+    function handleAddPriceAddon(addonPrice, addon) {
+        setTempPrice(tempPrice+addonPrice);
+  
+        const updatedItemPrice = selectedAddons.includes(addon._id)
+          ? tempPrice - addonPrice
+          : tempPrice + addonPrice;
+        
+        if(amount==0){
+          setItemPrice(updatedItemPrice);
+          setTempPrice(updatedItemPrice);
+          return;
+        }
+        setItemPrice(updatedItemPrice*amount);
+        setTempPrice(updatedItemPrice);
+        console.log(updatedItemPrice, 'addon');
+    }
+  
+    function handleAddPriceOption(optionGroupPrice,option){
+        setTempPrice(tempPrice+optionGroupPrice);
+        
+        const updatedItemPrice = selectedOptionGroups.includes(option._id)
+          ? tempPrice - optionGroupPrice
+          : tempPrice + optionGroupPrice;
+  
+        if(amount==0){
+          setItemPrice(updatedItemPrice);
+          setTempPrice(updatedItemPrice);
+          return;
+        }
+          setItemPrice(updatedItemPrice*amount);
+          setTempPrice(updatedItemPrice);
+  
+        console.log(updatedItemPrice, 'optionGroup')
+    }
+  
 
-        fetchCart();
+    async function editCart(){
+        //put , edit
 
-        console.log(selectedAddons,'addonSelect');
-        console.log(selectedOptionGroups,'optionSelect');
-
-        const checkCart = cartItem.find((cart) => {
-            return (
-                cart.name === item.name &&
-                cart.note === note &&
-                cart.addonId.length === selectedAddons.length &&
-                cart.optionGroupId.length === selectedOptionGroups.length &&
-                cart.addonId.every((addonId)=> selectedAddons.includes(addonId)) &&
-                cart.optionGroupId.every((optionGroupId) => selectedOptionGroups.includes(optionGroupId))
-            );
-        });
-
-        console.log(checkCart,'sameCartCheck1')
-
-        if(checkCart){
-            console.log(checkCart,'sameCartCheckHave')
-            if(amount>0){
-                const response = await fetch(`http://localhost:5000/carts/${checkCart._id}`, {
+        const response = await fetch(`http://localhost:5000/carts/${item._id}`, {
                     method: "PUT",
                     body: JSON.stringify({
-                      amount: checkCart.amount + amount,
-                      price: checkCart.price + itemPrice,
+                      amount: amount,
+                      price: itemPrice,
+                      addonId: selectedAddons,
+                      optionGroupId: selectedOptionGroups,
+                      note: note,
                     }),
                     headers: {
                       "Content-Type": "application/json",
@@ -133,77 +109,110 @@ export default function Detail(){
                   const resJson = await response.json();
                   console.log(resJson);
 
-                  fetchCart();
-                  setCartAmount(amount);
-                  setAmount(0);
-                  setNote('');
-                  setSelectedAddons([]);
-                  setSelectedOptionGroups([]);
-                  setItemPrice(item.price);
-                  setTempPrice(item.price);
-                  console.log(checkCart,'checkCartAfterHave');
-            }
-        }else {
-            console.log(checkCart,'sameCartCheckNull')
-            if(amount>0){
-                const response = await fetch("http://localhost:5000/carts", {
-                    method: "POST",
-                    body: JSON.stringify({
-                      name: item.name,
-                      thumbnail: item.thumbnail,
-                      price: itemPrice,
-                      addonId: selectedAddons,
-                      optionGroupId: selectedOptionGroups,
-                      amount: amount,
-                      note: note,
-                      itemId: item._id,
-                    }),
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                  });
-                  if (!response.ok) {
-                    throw new Error("Failed to add new cart");
+                  if(amount>item.amount){
+                    setCartAmount(amount);
                   }
-                  
-                  const resJson = await response.json();
-                  console.log(resJson);
-          
-                  fetchCart();
-                  setCartAmount(amount);
-                  setAmount(0);
+/*                   setAmount(0);
                   setNote('');
                   setSelectedAddons([]);
                   setSelectedOptionGroups([]);
                   setItemPrice(item.price);
-                  setTempPrice(item.price);
-                  console.log(checkCart,'checkCartAfterNull');
-            }
-        }
+                  setTempPrice(item.price); */
+
     }
     
 
     useEffect(() => {
-        async function fetchItem() {
-          try {
-            const res = await fetch(`http://localhost:5000/menus/${id}`);
-            const data = await res.json();
-            setItem(data);
-            setItemPrice(data.price);
-            setTempPrice(data.price);
-            console.log(data,'item');
-          } catch (error) {
-            console.error("Error fetching menus:", error);
+        let newTempPrice = defaultItem.price;
+
+        selectedAddons.forEach((addonId) => {
+          const addon = addons.find((addon) => addon._id === addonId);
+          if (addon) {
+            newTempPrice += addon.price;
           }
+        });
+
+        optionGroups.forEach((optionGroup) => {
+            if (optionGroup.options) {
+              optionGroup.options.forEach((optionSet) => {
+                if (selectedOptionGroups.includes(optionSet._id)) {
+                  newTempPrice += optionSet.price;
+                }
+              });
+            }
+        });
+
+        setTempPrice(newTempPrice);
+      
+
+        /* function calculateTotalAddonPrice(add){
+            let totalPrice = 0;
+            selectedAddons.forEach((addonId) => {
+                const addon = add.find((addon) => addon._id === addonId);
+                if (addon) {
+                  totalPrice += addon.price;
+                }
+              });
+            //setTempPrice(tempPrice + totalPrice);
+            console.log(totalPrice, 'totalAddon');
+            setAddonPrice(totalPrice);
         }
+    
+        function calculateTotalOptionGroupPrice(opt) {
+            let totalPrice = 0;
+            
+            opt.forEach((optionGroup) => {
+              if (optionGroup.options) {
+                optionGroup.options.forEach((optionSet) => {
+                  if (selectedOptionGroups.includes(optionSet._id)) {
+                    totalPrice += optionSet.price;
+                  }
+                });
+              }
+            });
+          
+            //setTempPrice(tempPrice + totalPrice);
+            console.log(totalPrice, 'totalOption');
+            setOptionPrice(totalPrice);
+        } */
+
+
+        async function fetchCart(){
+            try {
+                const res = await fetch(`http://localhost:5000/carts/${id}`);
+                const data = await res.json();
+                setItem(data);
+                setAmount(data.amount);
+                setItemPrice(data.price);
+                setNote(data.note);
+                setSelectedAddons(data.addonId);
+                setSelectedOptionGroups(data.optionGroupId);
+              } catch (error) {
+                console.error("Error fetching cartItems:", error);
+              }
+        }
+
+        async function fetchItem() {
+            try {
+              const res = await fetch(`http://localhost:5000/menus/${item.itemId}`);
+              const data = await res.json();
+              setDefaultItem(data);
+              setTempPrice(data.price);
+              console.log(tempPrice,'tempPriceFetch');
+              //base+ราคาaddon+ราคาoption เพิ่มตอนไหน
+            } catch (error) {
+              console.error("Error fetching menus:", error);
+            }
+          }
 
         async function fetchAddons() {
             try {
               const res = await fetch("http://localhost:5000/addons");
               const data = await res.json();
-              if(item.addonId.length>0){
-                const filteredAddons = data.filter(addon => item.addonId.includes(addon._id));
+              if(defaultItem.addonId.length>0){
+                const filteredAddons = data.filter(addon => defaultItem.addonId.includes(addon._id));
                 setAddons(filteredAddons);
+                //calculateTotalAddonPrice(data);
                 console.log(data,'addon');
               }
             } catch (error) {
@@ -215,9 +224,10 @@ export default function Detail(){
             try {
               const res = await fetch("http://localhost:5000/optiongroups");
               const data = await res.json();
-              if(item.optionGroupId.length>0){
-                const filteredOptions = data.filter(option => item.optionGroupId.includes(option._id));
+              if(defaultItem.optionGroupId.length>0){
+                const filteredOptions = data.filter(option => defaultItem.optionGroupId.includes(option._id));
                 setOptionGroups(filteredOptions);
+                //calculateTotalOptionGroupPrice(data);
                 console.log(data,'option');
               }
             } catch (error) {
@@ -225,24 +235,23 @@ export default function Detail(){
             }
           }
 
+
         if (!initial.current) {
-            console.log(initial.current);
             fetchCart();
             fetchItem();
         }
 
-        if (item.addonId && !initial.current) {
+        if (defaultItem.addonId && !initial.current) {
             fetchAddons();
             fetchOptions();
             initial.current = true;
         }
 
-
-    }, [addons,optionGroups, id, item.addonId, item.optionGroupId]);
+    },[addonPrice, addons, defaultItem.addonId, defaultItem.optionGroupId, defaultItem.price, id, item.itemId, itemPrice, optionGroups, optionPrice, selectedAddons, selectedOptionGroups, tempPrice])
 
     return(
         <DashboardLayout sideClose={sideClose} setSideClose={setSideClose} amount={cartAmount}>
-        <Box component="main" /* sx={{ backgroundColor: '#D3D3D3'}} */>
+            <Box component="main" /* sx={{ backgroundColor: '#D3D3D3'}} */>
          <Container maxWidth="x">
          <br/>
           <Button variant="contained" color="primary" onClick={handleBack}>
@@ -250,6 +259,7 @@ export default function Detail(){
           </Button>
             <br/>
             <br/>
+            {/* EditPage */}
             <Card sx={{
         marginTop:'20px',
         display: 'flex',
@@ -273,12 +283,11 @@ export default function Detail(){
                     src={item.thumbnail}
                 />
                 
-                {/* เพิ่มจำนวนสินค้า */}
             </Grid>
 
             <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
                 <Box sx={{ paddingLeft: { xs: 4, sm: 2, md: 3, lg: 4, xl: 5 } }}>
-                    {item.addonId && item.addonId.length>0 && (
+                    {defaultItem.addonId && defaultItem.addonId.length>0 && (
                         <>
                     <Typography variant="h4" component="h4">
                         <u>เมนูเพิ่มเติม</u>
@@ -318,7 +327,7 @@ export default function Detail(){
                     )}
                     <br/>
 
-                    {item.optionGroupId && item.optionGroupId.length > 0 && (
+                    {defaultItem.optionGroupId && defaultItem.optionGroupId.length > 0 && (
                         <>
                     <Typography variant="h4" component="h4">
                         <u>ตัวเลือก</u>
@@ -391,7 +400,7 @@ export default function Detail(){
                     </Button>
                     </Typography>
                 <br/>
-                <Button sx={{fontSize:25}} fullWidth variant="contained" onClick={addToCart}>
+                <Button sx={{fontSize:25}} fullWidth variant="contained" onClick={editCart}>
                     ซื้อสินค้า {itemPrice} บาท {/* ราคา + เมนูเพิ่มเติ่ม + ตัวเลือก */}
                 </Button>
                 </Box>

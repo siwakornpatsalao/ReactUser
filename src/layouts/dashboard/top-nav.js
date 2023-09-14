@@ -111,13 +111,12 @@ export const TopNav = (props) => {
     if (amount) {
       setCurrent((prevCurrent) => prevCurrent + amount);
     }
-
-
+/* 
     console.log(countItem,'countItem3');
-    console.log(cartCount, 'cartCount3');
+    console.log(cartCount, 'cartCount3'); */
     if(countItem<=cartCount && countItem!=0 && cartCount!=0){
-      console.log(countItem,'countItem2');
-      console.log(cartCount, 'cartCount2');
+/*       console.log(countItem,'countItem2');
+      console.log(cartCount, 'cartCount2'); */
       setCartCount(countItem);
       setCurrent(0);
     }
@@ -132,9 +131,9 @@ export const TopNav = (props) => {
           totalAmount += dataItem.amount;
         });
         setCartCount(totalAmount);
-        console.log(data, 'cartTopNav');
+/*         console.log(data, 'cartTopNav');
         console.log(countItem,'testttttt')
-        console.log("Total amount in cart:", totalAmount);
+        console.log("Total amount in cart:", totalAmount); */
       } catch (error) {
         console.error("Error fetching carts:", error);
       }
@@ -142,7 +141,7 @@ export const TopNav = (props) => {
 
     if (!initial.current) {
       initial.current = true;
-      console.log(initial.current);
+/*       console.log(initial.current); */
       fetchCart();
     }
       
