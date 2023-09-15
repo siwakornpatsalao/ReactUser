@@ -26,6 +26,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import ListItemText from '@mui/material/ListItemText';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import QRCode from 'qrcode.react';
 
 export const SideNav = (props) => {
   const { open, onClose, detailCheck, onDataSend} = props;
@@ -39,19 +41,58 @@ export const SideNav = (props) => {
   const [addon, setAddon] = useState([]);
   const [optionGroup, setOptionGroup] = useState([]);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isQRDialogOpen, setQRDialogOpen] = useState(false);
+  const [isCashDialogOpen, setCashDialogOpen] = useState(false);
+  const [selectedDelete, setSelectedDelete] = useState([]);
+  const [method, setMethod] = useState('');
+  const [qrCodeScanned, setQRCodeScanned] = useState(false);
+  const router = useRouter();
 
   function handlePay(){
+    if(method=='qr'){
+      console.log('this is qr code method');
+      setQRDialogOpen(true);
+    }else if (method=='cash'){
+      console.log('this is cash method');
+      setCashDialogOpen(true);
+    }
+  }
+
+  function handlePayByQR(){
     setCart([]);
+    setQRDialogOpen(false);
+    Swal.fire(`ออเดอร์ที่ 1`, "ชำระเงินเรียบร้อยแล้ว", "success");
   }
 
-  function handleOpenDeleteDialog() {
+  function handlePayByCash(){
+    setCart([]);
+    setQRDialogOpen(false);
+    Swal.fire(`ออเดอร์ที่ 2`, "กรุณาชำระเงินที่เคาน์เตอร์", "success");
+  }
+
+/*   function handleQRCodeScan() {
+    console.log('scan qr code แล้ว');
+    setQRCodeScanned(true);
+    setQRDialogOpen(false);
+    setCart([]);
+    Swal.fire(`ออเดอร์ที่ 1`, "ชำระเงินเรียบร้อยแล้ว", "success");
+  }
+ */
+
+  const handleSelectedMethod = (event) => {
+    setMethod(event.target.value)
+  };
+
+  function handleOpenDeleteDialog(item) {
     setDeleteDialogOpen(true);
+    setSelectedDelete(item);
   }
 
 
-  async function handleDeleteCart(item){
+  async function handleDeleteCart(){
+    console.log(selectedDelete,'itemDelete');
     try {
-      const response = await fetch(`http://localhost:5000/carts/${item._id}`, {
+      const response = await fetch(`http://localhost:5000/carts/${selectedDelete._id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -62,7 +103,7 @@ export const SideNav = (props) => {
         throw new Error("Failed to delete cart");
       }
 
-      const response2 = await fetch(`http://localhost:5000/carts/`, {
+      /*  const response2 = await fetch(`http://localhost:5000/carts/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -77,8 +118,16 @@ export const SideNav = (props) => {
       console.log(resJson,'data');
       setDeleteDialogOpen(false);
       handleDataSend(resJson);
-      setCart(resJson);
+      setCart(resJson); */
+
+      const updatedCart = cart.filter((item) => item._id !== selectedDelete._id);
+      setDeleteDialogOpen(false);
+      //handleDataSend(updatedCart); //แก้ cart ไม่ updated
+      setCart(updatedCart);
+
+      setSelectedDelete([]);
       //setNewAmount
+      router.push('/index2');
     } catch (error) {
       console.error("Error deleting cart:", error);
     }
@@ -102,6 +151,7 @@ export const SideNav = (props) => {
   }
 
   useEffect(() => {
+
   async function fetchAddon() {
     try {
       const res = await fetch("http://localhost:5000/addons");
@@ -131,7 +181,7 @@ export const SideNav = (props) => {
     fetchAddon();
     fetchOption();
   }
-}, []);
+}, [cart]);
 
   /* const handleCloseSide = () => {
     setOpenNav(false); // Close the SideNav
@@ -180,26 +230,29 @@ export const SideNav = (props) => {
             }}
           >
             {cart.map((cartItem) => (
-              <div key={cartItem.id}>
+              <div style={{marginBottom:'10px'}} key={cartItem.id}>
                 <Card>
                   <CardContent>
-                  <IconButton onClick={() => handleOpenDeleteDialog()}><CloseIcon/></IconButton><br/>
-                  <Link href={`/editCart?id=${cartItem._id}`} >
-                    <Button>แก้ไข</Button>
-                  </Link>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Link href={`/editCart?id=${cartItem._id}`}>
+                      <Button>แก้ไข</Button>
+                    </Link>
+                    <IconButton onClick={() => handleOpenDeleteDialog(cartItem)}>
+                      <CloseIcon />
+                    </IconButton>
+                  </div>
                     <span style={{ fontSize: 25, fontWeight: 'bold' }}>{cartItem.name}</span>
                     {cartItem.addonId.length>0 &&
-                                                    <>
-                                                     <br/>
-                                                 <span style={{ fontSize: 20 }}>เมนูเพิ่มเติม:</span>
+                                                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                    <span style={{ fontSize: 20 }}>เมนูเพิ่มเติม:</span>
                                                     {addon.filter((addonItem) => cartItem.addonId.includes(addonItem._id))
                                                           .map((matchingAddonItem) => (
                                                           <div key={matchingAddonItem._id}>
                                                              <span style={{marginLeft:'10px'}}>{matchingAddonItem.name}</span>   
                                                           </div>))}
-                                                    </>}
+                                                    </div>}
                     {cartItem.optionGroupId.length>0 &&
-                                                    <>
+                                                    <div style={{ display: 'flex', marginTop:'5px' }}>
                                                     <br/> 
                                                     <span style={{ fontSize: 20 }}>ตัวเลือก:</span> {optionGroup.map((option) => (
                                                                 <div key={option._id}>
@@ -210,15 +263,15 @@ export const SideNav = (props) => {
                                                                       )
                                                                       .map((matchOption,index) => (
                                                                         <div key={matchOption._id}>
-                                                                          {index==0 && <span>{option.name}: <br/></span>}
-                                                                          <span style={{marginLeft:'15px'}}>{matchOption.name}</span>
+                                                                          {index==0 && <span style={{marginLeft:'20px', marginTop:'10px', fontSize:18}}>{option.name} : <br/></span>}
+                                                                          <span style={{marginLeft:'40px'}}>{matchOption.name}</span>
                                                                         </div>
                                                                       ))}
                                                                 </div>
                                                               ))}
-                                                    </>}
+                                                    </div>}
                     {cartItem.note && <><br/><span style={{ fontSize: 20 }}>Note:</span> {cartItem.note}</>}
-                    <br/> <span style={{ fontSize: 20 }}>ราคา:</span> {cartItem.price} บาท
+                    <hr/> <span style={{ fontSize: 20}}>ราคา:</span> {cartItem.price} บาท
                     <br/> <span style={{ fontSize: 20 }}>จำนวน:</span> {cartItem.amount} ชิ้น
                   </CardContent>
                 </Card>
@@ -234,11 +287,58 @@ export const SideNav = (props) => {
 
                   <DialogActions>
                     <Button onClick={() => setDeleteDialogOpen(false)}>ยกเลิก</Button>
-                    <Button onClick={() => handleDeleteCart(cartItem)} color="error">
+                    <Button onClick={() => handleDeleteCart()} color="error">
                       ยืนยัน
                     </Button>
                   </DialogActions>
                 </Dialog>
+
+
+
+                <Dialog
+                  sx={{ '& .MuiDialog-paper': { width: '16%', maxHeight: 435 } }}
+                  maxWidth="xs"
+                  open={isQRDialogOpen}
+                  onClose={() => setQRDialogOpen(false)}
+                >
+                  <DialogTitle sx={{fontSize:25}}>กรุณาสแกน Qr Code </DialogTitle>
+                  <DialogContent>
+                  {qrCodeScanned ? (
+                      <p>QR Code scanned successfully!</p>
+                    ) : (<>
+                    <QRCode
+                      value={'คุณชำระเงินผ่าน QR Code'}
+                      size={200}
+                      level={'H'} 
+                      renderAs={'svg'}
+                    />
+                    {/* <img alt="" src="/assets/qrcodeImage.png" /> */}
+                    </>)}
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={() => setQRDialogOpen(false)}>ยกเลิก</Button>
+                    <Button onClick={() => handlePayByQR()} color="error">
+                      ยืนยัน
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+
+                <Dialog
+                  sx={{ '& .MuiDialog-paper': { width: '20%', maxHeight: 435 } }}
+                  maxWidth="md"
+                  open={isCashDialogOpen}
+                  onClose={() => setCashDialogOpen(false)}
+                >
+                  <DialogTitle sx={{fontSize:25}}>คุณต้องการชำระเงินด้วยเงินสดหรือไม่ </DialogTitle>
+
+                  <DialogActions>
+                    <Button onClick={() => setCashDialogOpen(false)}>ยกเลิก</Button>
+                    <Button onClick={() => handlePayByCash()} color="error">
+                      ยืนยัน
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+
 
               </div>
 
@@ -253,7 +353,7 @@ export const SideNav = (props) => {
                 วิธีการชำระเงิน
                 </Typography>
                 <br/>
-                <RadioGroup>
+                <RadioGroup value={method} onChange={handleSelectedMethod}>
                   <FormControlLabel value="qr" control={<Radio />} label={
                     <Typography variant="h6" component="h6">
                       Scan QR Code
@@ -268,50 +368,7 @@ export const SideNav = (props) => {
                 </RadioGroup>
               </CardContent>
             </Card>
-{/*             <Card>
-              <CardContent>
-                <span style={{fontSize:25}}>เครปไส้แตก</span><br/> แป้ง: วนิลา<br/>ไส้: พริกเผา หมูหยอง ทูน่า ...<br/>ไส้พิเศษ: ไข่ไก่ <br/>ซอส: มะเขือเทศ มายองชีส<br/>ราคา 50 บาท  จำนวน 1 ชื้น
-              </CardContent>
-            </Card>
-            <br/>
-            <Card>
-              <CardContent>
-                <Typography variant="h4">
-                วิธีการชำระเงิน
-                </Typography>
-                <br/>
-                <RadioGroup>
-                  <FormControlLabel value="qr" control={<Radio />} label={
-                    <Typography variant="h6" component="h6">
-                      Scan QR Code
-                    </Typography>
-                  } />
-                    <br/>
-                  <FormControlLabel value="cash" control={<Radio />} label={
-                    <Typography variant="h6" component="h6">
-                      จ่ายเงินสด
-                    </Typography>
-                  } />
-                </RadioGroup>
-              </CardContent>
-            </Card> */}
 
-
-            {/* {items.map((item) => {
-              const active = item.path ? (pathname === item.path) : false;
-
-              return (
-                <SideNavItem
-                  active={active}
-                  disabled={item.disabled}
-                  external={item.external}
-                  icon={item.icon}
-                  key={item.title}
-                  path={item.path}
-                  title={item.title}
-                />
-              );
-            })} */}
           </Stack>
           <br/>
           <br/>
@@ -324,15 +381,6 @@ export const SideNav = (props) => {
               </CardContent>
         </Card>
         </Box>
-
-{/*         <Card sx={{ borderRadius: 0 ,border: '2px solid black'}}>
-              <CardContent>
-                <span style={{fontSize:25}}>ราคารวม</span>  <span style={{marginLeft:'170px'}}></span> <span style={{fontSize:25}}>{cart.reduce((totalPrice, cartItem) => totalPrice + cartItem.price, 0)}</span><br/><br/>
-                <Button  sx={{ fontSize:25}} variant='contained' fullWidth>
-                ชำระเงิน
-                </Button>
-              </CardContent>
-        </Card> */}
 
       </Box>
     </Scrollbar>
