@@ -1,4 +1,4 @@
-import { Button, Box, Container, Typography, TextField, CardContent, Card } from "@mui/material";
+import { Button, Box, Container, Typography, TextField, CardContent, Card, MenuItem } from "@mui/material";
 import { useRouter } from 'next/router';
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import Grid from "@mui/material/Grid";
@@ -14,6 +14,7 @@ export default function Detail(){
     const [item, setItem] = useState([]);
     const [addons, setAddons] = useState([]);
     const [optionGroups, setOptionGroups] = useState([]);
+    const [promotion, setPromotion] = useState([]);
     const [selectedAddons, setSelectedAddons] = useState([]);
     const [selectedOptionGroups, setSelectedOptionGroups] = useState([]);
     const [amount, setAmount] = useState(0);
@@ -81,15 +82,33 @@ export default function Detail(){
         setNote(event.target.value);
     };
 
-    async function fetchCart(){
-        try {
-            const res = await fetch(`http://localhost:5000/carts`);
-            const data = await res.json();
-            setCartItem(data);
-            console.log(data,'cartDetail');
-          } catch (error) {
-            console.error("Error fetching cartItems:", error);
-          }
+    function hasPromotion() {
+      const hasPromo = promotion.some(promo => {
+        return promo.menuId.includes(item._id);
+      });
+      return hasPromo;
+    }
+  
+    function promoData(){
+      const promo = promotion.filter(promo => {
+        return promo.menuId.includes(item._id);
+      });
+      return promo;
+    }
+  
+    function hasPromotionCategory(){
+      const hasPromo = promotion.some(promo => {
+        return promo.category.includes(item.category);
+      });
+      return hasPromo;
+    }
+    
+    function promoCategoryData(){
+      const promo = promotion.filter(promo => {
+        return promo.category.includes(item.category);
+      });
+      console.log(`Category ${item.category} has promotion:`, promo);
+      return promo;
     }
 
     async function addToCart(){
@@ -182,6 +201,16 @@ export default function Detail(){
         }
     }
     
+    async function fetchCart(){
+      try {
+          const res = await fetch(`http://localhost:5000/carts`);
+          const data = await res.json();
+          setCartItem(data);
+          console.log(data,'cartDetail');
+        } catch (error) {
+          console.error("Error fetching cartItems:", error);
+        }
+    }
 
     useEffect(() => {
         async function fetchItem() {
@@ -223,7 +252,18 @@ export default function Detail(){
             } catch (error) {
               console.error("Error fetching Options:", error);
             }
+        }
+        
+        async function fetchPromotion() {
+          try {
+            const res = await fetch("http://localhost:5000/promotions");
+            const data = await res.json();
+            setPromotion(data);
+            console.log("Promotion Data:", data);
+          } catch (error) {
+            console.error("Error fetching promotion:", error);
           }
+        }
 
         if (!initial.current) {
             console.log(initial.current);
@@ -234,6 +274,7 @@ export default function Detail(){
         if (item.addonId && !initial.current) {
             fetchAddons();
             fetchOptions();
+            fetchPromotion();
             initial.current = true;
         }
 
@@ -370,6 +411,52 @@ export default function Detail(){
                         </>
                         )}
                     </>
+                )}
+                <br/>
+                {(hasPromotion() && hasPromotionCategory()) && (
+                  <div>
+                    <Typography variant="h4" component="h4">
+                        <u>โปรโมชั่น</u>
+                    </Typography>
+                    <br/>
+                    <Typography variant="h5" component="h5">โปรโมชั่นสำหรับเมนู</Typography>
+                    <br/>
+                    {promoData().map((promo) => (
+                      <div key={promo.id}>
+                        <p style={{fontSize:20, marginTop:'5px'}}>หัวข้อ: {promo.topic}</p>
+                        <p style={{fontSize:18, marginLeft:'20px'}}>เนื้อหา: {promo.message}</p>
+                      </div>
+                    ))}
+                    <br/>
+                    {hasPromotionCategory() && (
+                      <div>
+                      <Typography variant="h5" component="h5">โปรโมชั่นสำหรับหมวดหมู่</Typography>
+                      <br/>
+                      {promoCategoryData().map((promo) => (
+                        <div key={promo.id}>
+                          <p style={{fontSize:20, marginTop:'5px'}}>หัวข้อ: {promo.topic}</p>
+                          <p style={{fontSize:18, marginLeft:'20px' /* ,color:'grey' */}}>เนื้อหา: {promo.message}</p>
+                        </div>
+                      ))}
+                      </div>)}
+                  </div>
+                )}
+
+                {(hasPromotionCategory() && !hasPromotion()) && (
+                  <>
+                  <Typography variant="h4" component="h4">
+                        <u>โปรโมชั่น</u>
+                    </Typography>
+                    <br/>
+                  <Typography variant="h5" component="h5">โปรโมชั่นสำหรับหมวดหมู่</Typography>
+                      <br/>
+                      {promoCategoryData().map((promo) => (
+                        <div key={promo.id}>
+                          <p style={{fontSize:20, marginTop:'5px'}}>หัวข้อ: {promo.topic}</p>
+                          <p style={{fontSize:18, marginLeft:'20px'}}>เนื้อหา: {promo.message}</p>
+                        </div>
+                      ))}
+                  </>
                 )}
 
                 <br/>

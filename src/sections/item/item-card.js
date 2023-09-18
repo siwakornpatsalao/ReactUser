@@ -9,17 +9,8 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import CelebrationIcon from '@mui/icons-material/Celebration';
 
 export const ItemCard = (props) => {
-  const { item } = props;
+  const { item,hasPromotion,hasPromotionCategory } = props;
 
-  /* const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
- */
   return (
     <Card
       sx={{
@@ -28,6 +19,7 @@ export const ItemCard = (props) => {
         height: '100%',
         maxWidth: 320,
         border: '1px solid #ccc', 
+        position: 'relative',
       }}
       style={{
         boxShadow: ' 2px 9px #EADDCD',/* #D8E8DC */
@@ -88,6 +80,24 @@ export const ItemCard = (props) => {
           direction="row"
           spacing={1}
         >
+
+        {(hasPromotion || hasPromotionCategory) && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '10px', 
+                right: '10px', 
+                backgroundColor: '#ff0000',
+                color: '#ffffff', 
+                padding: '4px 8px', 
+                borderRadius: '4px', 
+                fontSize: '14px', 
+                fontWeight: 'bold', 
+              }}
+            >
+              Promotion
+            </div>
+          )}
 
           {/* {hasPromotion && (
             <div>

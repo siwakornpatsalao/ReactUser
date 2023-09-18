@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-sync-scripts */
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import PropTypes from 'prop-types';
@@ -46,27 +47,54 @@ export const SideNav = (props) => {
   const [selectedDelete, setSelectedDelete] = useState([]);
   const [method, setMethod] = useState('');
   const [qrCodeScanned, setQRCodeScanned] = useState(false);
+  const [qrImageSrc, setQRImageSrc] = useState('');
   const router = useRouter();
 
   function handlePay(){
     if(method=='qr'){
       console.log('this is qr code method');
       setQRDialogOpen(true);
+      genQR();
     }else if (method=='cash'){
       console.log('this is cash method');
       setCashDialogOpen(true);
     }
   }
 
+  function genQR() {
+    fetch('http://localhost:7000/generateQR', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ amount: 2 }), //cart.reduce((totalPrice, cartItem) => totalPrice + cartItem.price, 0)
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log('good', data);
+        setQRImageSrc(data.Result);
+      })
+      .catch((error) => {
+        console.error('bad', error);
+      });
+  }
+
   function handlePayByQR(){
     setCart([]);
     setQRDialogOpen(false);
+    onClose();
     Swal.fire(`ออเดอร์ที่ 1`, "ชำระเงินเรียบร้อยแล้ว", "success");
   }
 
   function handlePayByCash(){
     setCart([]);
     setQRDialogOpen(false);
+    onClose();
     Swal.fire(`ออเดอร์ที่ 2`, "กรุณาชำระเงินที่เคาน์เตอร์", "success");
   }
 
@@ -296,24 +324,20 @@ export const SideNav = (props) => {
 
 
                 <Dialog
-                  sx={{ '& .MuiDialog-paper': { width: '16%', maxHeight: 435 } }}
-                  maxWidth="xs"
+                  sx={{ '& .MuiDialog-paper': { width: '30%', maxHeight: 800 } }}
+                  maxWidth="md"
                   open={isQRDialogOpen}
                   onClose={() => setQRDialogOpen(false)}
                 >
                   <DialogTitle sx={{fontSize:25}}>กรุณาสแกน Qr Code </DialogTitle>
                   <DialogContent>
-                  {qrCodeScanned ? (
-                      <p>QR Code scanned successfully!</p>
-                    ) : (<>
-                    <QRCode
-                      value={'คุณชำระเงินผ่าน QR Code'}
-                      size={200}
-                      level={'H'} 
-                      renderAs={'svg'}
-                    />
-                    {/* <img alt="" src="/assets/qrcodeImage.png" /> */}
-                    </>)}
+
+                    <img id="imgqr" src={qrImageSrc} style={{ width: '500px', objectFit: 'contain' }} />
+                    <script
+                      src="https://code.jquery.com/jquery-3.7.1.js"
+                      integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+                      crossorigin="anonymous"></script>
+
                   </DialogContent>
                   <DialogActions>
                     <Button onClick={() => setQRDialogOpen(false)}>ยกเลิก</Button>

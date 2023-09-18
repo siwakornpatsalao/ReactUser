@@ -60,7 +60,38 @@ function Index2(){
     const clearCategoryFilter = () => {
         setCategory('');
         setItems(originalItems);
-      };
+    };
+
+    function hasPromotion(menuId) {
+      const hasPromo = promotion.some(promo => {
+        return promo.menuId.includes(menuId);
+      });
+      return hasPromo;
+    }
+  
+    function promoData(menuId){
+      const promo = promotion.filter(promo => {
+        return promo.menuId.includes(menuId);
+      });
+      return promo;
+    }
+  
+    function hasPromotionCategory(category){
+      const hasPromo = promotion.some(promo => {
+        return promo.category.includes(category);
+      });
+      return hasPromo;
+    }
+    
+    function promoCategoryData(category){
+      console.log(`Category ID to check: ${category}`);
+      const promo = promotion.filter(promo => {
+        console.log(`Promo Category IDs:`, promo.category);
+        return promo.category.includes(category);
+      });
+      console.log(`Category ${category} has promotion:`, promo);
+      return promo;
+    }
 
     useEffect(() => {
         async function fetchItems() {
@@ -173,7 +204,8 @@ function Index2(){
                   lg={3}
                   key={item._id}
                 >
-                   <ItemCard item={item}/> 
+                   <ItemCard item={item} hasPromotion={hasPromotion(item._id)} hasPromotionCategory={hasPromotionCategory(item.category)} 
+                    promoData={promoData(item._id)} promoCategoryData={promoCategoryData(item.category)} /> 
                    <br/>
                 </Grid>
               ))}
