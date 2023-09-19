@@ -28,12 +28,13 @@ import DialogActions from "@mui/material/DialogActions";
 import ListItemText from '@mui/material/ListItemText';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import QRCode from 'qrcode.react';
+import Grid from '@mui/material/Grid';
 
 export const SideNav = (props) => {
   const { open, onClose, detailCheck, onDataSend} = props;
   const pathname = usePathname();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
+  // const MdUp = useMediaQuery((theme) => theme.breakpoints.up('md'));
   const auth = useAuth();
   const [cart, setCart] = useState([]);
   const initial = useRef(false);
@@ -49,6 +50,23 @@ export const SideNav = (props) => {
   const [qrCodeScanned, setQRCodeScanned] = useState(false);
   const [qrImageSrc, setQRImageSrc] = useState('');
   const router = useRouter();
+  const [countdownTime, setCountdownTime] = useState(60); 
+
+  const updateCountdown = () => {
+    setCountdownTime((prevTime) => Math.max(0, prevTime - 1)); 
+  };
+
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+  
+    const formattedHours = hours.toString().padStart(2, '0');
+    const formattedMinutes = minutes.toString().padStart(2, '0');
+    const formattedSeconds = remainingSeconds.toString().padStart(2, '0');
+  
+    return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+  };
 
   function handlePay(){
     if(method=='qr'){
@@ -67,7 +85,7 @@ export const SideNav = (props) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ amount: 2 }), //cart.reduce((totalPrice, cartItem) => totalPrice + cartItem.price, 0)
+      body: JSON.stringify({ amount: 2, mobileNumber: '1234567890' }), //cart.reduce((totalPrice, cartItem) => totalPrice + cartItem.price, 0) , 0929814802
     })
       .then((response) => {
         if (!response.ok) {
@@ -78,10 +96,16 @@ export const SideNav = (props) => {
       .then((data) => {
         console.log('good', data);
         setQRImageSrc(data.Result);
+
+        setTimeout(() => {
+          setQRDialogOpen(false);  
+        }, 60 * 1000);
       })
       .catch((error) => {
         console.error('bad', error);
       });
+
+      //show for 5 minute
   }
 
   function handlePayByQR(){
@@ -209,7 +233,23 @@ export const SideNav = (props) => {
     fetchAddon();
     fetchOption();
   }
-}, [cart]);
+
+  let countdownInterval;
+
+  if (isQRDialogOpen) {
+    // Start the countdown
+    countdownInterval = setInterval(updateCountdown, 1000);
+  } else {
+    // Reset the countdown time when the QR dialog is closed
+    setCountdownTime(60);
+  }
+
+  return () => {
+    // Clear the countdown interval when the QR dialog is closed
+    clearInterval(countdownInterval);
+  };
+
+}, [cart,isQRDialogOpen]);
 
   /* const handleCloseSide = () => {
     setOpenNav(false); // Close the SideNav
@@ -306,7 +346,7 @@ export const SideNav = (props) => {
                 <br/>
 
                 <Dialog
-                  sx={{ '& .MuiDialog-paper': { width: '80%', maxHeight: 435 } }}
+                  sx={{ '& .MuiDialog-paper': {maxWidth: '100%', maxHeight: '80%' } }}
                   maxWidth="xs"
                   open={isDeleteDialogOpen}
                   onClose={() => setDeleteDialogOpen(false)}
@@ -324,20 +364,28 @@ export const SideNav = (props) => {
 
 
                 <Dialog
-                  sx={{ '& .MuiDialog-paper': { width: '30%', maxHeight: 800 } }}
+                  sx={{ '& .MuiDialog-paper': { maxWidth: '90%', maxHeight: '80%' } }}
                   maxWidth="md"
                   open={isQRDialogOpen}
                   onClose={() => setQRDialogOpen(false)}
                 >
                   <DialogTitle sx={{fontSize:25}}>กรุณาสแกน Qr Code </DialogTitle>
                   <DialogContent>
-
-                    <img id="imgqr" src={qrImageSrc} style={{ width: '500px', objectFit: 'contain' }} />
+                    <Grid>
+                    <img id="imgqr" src={qrImageSrc} style={{ width: '100%', objectFit: 'contain' }} />
                     <script
                       src="https://code.jquery.com/jquery-3.7.1.js"
                       integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
                       crossorigin="anonymous"></script>
 
+                    <span style={{fontSize:25}}>ราคารวม</span>  
+                    <span style={{marginLeft:'120px'}}></span> 
+                    <span style={{fontSize:25}}>{cart.reduce((totalPrice, cartItem) => totalPrice + cartItem.price, 0)} บาท</span>
+                    <br/><br/>
+
+                    {/* <span style={{ fontSize: 25 }}>เวลาที่เหลือ: {countdownTime} วินาที</span> */}
+                    <span style={{ fontSize: 25 }}>เวลาที่เหลือ: {formatTime(countdownTime)}</span>
+                    </Grid>
                   </DialogContent>
                   <DialogActions>
                     <Button onClick={() => setQRDialogOpen(false)}>ยกเลิก</Button>
@@ -348,7 +396,7 @@ export const SideNav = (props) => {
                 </Dialog>
 
                 <Dialog
-                  sx={{ '& .MuiDialog-paper': { width: '20%', maxHeight: 435 } }}
+                  sx={{ '& .MuiDialog-paper': { maxWidth: '100%', maxHeight: '80%' } }}
                   maxWidth="md"
                   open={isCashDialogOpen}
                   onClose={() => setCashDialogOpen(false)}
